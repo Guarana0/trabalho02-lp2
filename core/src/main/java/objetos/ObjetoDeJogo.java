@@ -2,7 +2,7 @@ package objetos;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
-import mapa.Tile;
+import mapa.tiles.Tile;
 
 public abstract class ObjetoDeJogo implements Tile {
     protected final TextureRegion textura;
