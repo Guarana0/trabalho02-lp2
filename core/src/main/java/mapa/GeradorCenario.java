@@ -4,6 +4,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 
+import mapa.tiles.Tile;
+import mapa.tiles.TileFactory;
+
 public class GeradorCenario {
     private final Array<Tile> tilesAtivos;
     private float proximoX = 0;
