@@ -1,16 +1,21 @@
 package personagem;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
 
 public abstract class Inimigo extends Personagem {
     protected int vida = 1;
-    // para gerar posição aleatoria do inimigo no mapa conforme tasmanho da tela e do mundo atual
-    float randomX = MathUtils.random();
-    float randomY = MathUtils.random();
 
-    public Inimigo(float x, float y, float altura, float largura) {
-        super(x, y, altura, largura);
+    public Inimigo(float larguraMapa, float alturaMapa, float altura, float largura, Sound somDano) {
+        super(
+            // geração aleatoria da psoição do inimigo consulta no StackOverflow: Enemy spawning problem [closed]
+            MathUtils.random(0f, Math.max(0f, Math.min(Gdx.graphics.getWidth(), larguraMapa) - largura)),
+            MathUtils.random(0f, Math.max(0f, Math.min(Gdx.graphics.getHeight(), alturaMapa) - altura)),
+            altura,
+            largura,
+            somDano
+        );
     }
 }
 

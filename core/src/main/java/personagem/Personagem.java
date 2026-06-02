@@ -1,5 +1,6 @@
 package personagem;
 
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
@@ -15,12 +16,15 @@ public abstract class Personagem {
 	protected Vector2 posicao;
 	protected Rectangle colisao;
 
-	public Personagem(float x, float y, float altura, float largura) {
+	protected Sound somDano;
+
+	public Personagem(float x, float y, float altura, float largura, Sound somDano) {
 		this.dimensoes = new Vector2(largura, altura);
 		this.posicao = new Vector2(x, y);
 		this.velocidade = new Vector2(0, 0);
 		this.colisao = new Rectangle(x, y, largura, altura);
 		this.estaVivo = true;
+		this.somDano = somDano;
 	}
 
 }
