@@ -68,6 +68,23 @@ public class Principal extends Personagem {
 
         float novoX = posicao.x + (VELOCIDADE_CORRIDA * deltaTempo);
 
+        // caso o personagem tente afundar pra dps do chao, eu travo ele no chao pra
+        // evitar bugs
+        if (novoY < ALTURA_CHAO) {
+            novoY = ALTURA_CHAO;
+            velocidadeY = 0;
+
+        } else if (novoY > ALTURA_TETO) {
+            novoY = ALTURA_TETO;
+            velocidadeY = 0;
+        }
+
+        // aqui serve pra salvar os valores calculados da posicao so personagem
+        posicao.set(novoX, novoY);
+
+        // atualizei a caixa de colisao pra ela ficar colada no personagem
+        colisao.setPosition(novoX, novoY);
+
     }
 
 }
