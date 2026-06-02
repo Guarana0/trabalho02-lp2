@@ -1,4 +1,4 @@
-package mapa;
+package mapa.tiles;
 
 import java.util.HashMap;
 import java.util.Map;

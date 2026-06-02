@@ -1,30 +1,27 @@
-package mapa;
+package mapa.tiles;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import objetos.ObjetoDeJogo;
 
-public class ConcretoTile extends ObjetoDeJogo{
+public class MoedaTile extends ObjetoDeJogo {
 
-    public ConcretoTile(TextureRegion textura, float x, float y) {
+    public MoedaTile(TextureRegion textura, float x, float y) {
         super(textura, x, y);
     }
 
     @Override
     public Tile clone() {
-        return new ConcretoTile(this.textura, this.posicao.x, this.posicao.y);
+        return new MoedaTile(this.textura, this.posicao.x, this.posicao.y);
     }
 
     @Override
     public boolean ehAndavel() {
-        return true;
+        return false; 
     }
 
     @Override
     public boolean daDano() {
-        return false;
+         return false; 
     }
-
-    
-    
 }

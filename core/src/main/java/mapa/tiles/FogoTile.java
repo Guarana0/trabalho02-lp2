@@ -1,4 +1,4 @@
-package mapa;
+package mapa.tiles;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
