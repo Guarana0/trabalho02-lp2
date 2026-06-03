@@ -1,3 +1,5 @@
+package br.com.lgalarane.trabalho02;
+
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;

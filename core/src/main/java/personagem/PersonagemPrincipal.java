@@ -4,9 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
 
-public class Principal extends Personagem {
+public class PersonagemPrincipal extends Personagem {
     // variaveis para verificar a mudança de state ao longo do jogo
-    private boolean apertouD, apertouS, apertouA, apertouEsp;
+    private boolean apertouD, apertouS, apertouEsp;
     private boolean clickDir, clickEsq;
 
     private int vida = 3;
@@ -32,7 +32,7 @@ public class Principal extends Personagem {
     // velocidade que o personagem corre em X
     private final float VELOCIDADE_CORRIDA = 205f;
 
-    public Principal(float x, float y, float altura, float largura, Sound somDano) {
+    public PersonagemPrincipal(float x, float y, float altura, float largura, Sound somDano) {
         super(x, y, altura, largura, somDano);
     }
 
@@ -83,7 +83,7 @@ public class Principal extends Personagem {
         posicao.set(novoX, novoY);
 
         // atualizei a caixa de colisao pra ela ficar colada no personagem
-        colisao.setPosition(novoX, novoY);
+        areaColisao.setPosition(novoX, novoY);
 
     }
 
