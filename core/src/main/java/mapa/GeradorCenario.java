@@ -1,14 +1,19 @@
 package mapa;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 
-import mapa.tiles.Tile;
-import mapa.tiles.TileFactory;
+import mapa.tiles.ConcretoTile;
+import mapa.tiles.FogoTile;
+import mapa.tiles.GramaTile;
+import mapa.tiles.MoedaTile;
+import mapa.tiles.NeveTile;
+import objetos.ObjetoDeJogo;
 
 public class GeradorCenario {
-    private final Array<Tile> tilesAtivos;
+    private final Array<ObjetoDeJogo> objetosAtivos; 
     private float proximoX = 0;
     private final float TAMANHO_TILE = 64f;
 
@@ -16,17 +21,23 @@ public class GeradorCenario {
     private int blocosGeradosNoBiomaAtual = 0;
     private final int DURACAO_DO_BIOMA = 50; 
 
-    // IDs da TileFactory
-    private final int ID_CONCRETO  = 1;
-    private final int ID_MOEDA     = 2;
-    private final int ID_FOGO      = 3;
-    private final int ID_NEVE      = 4;
-    private final int ID_GRAMA     = 5; 
+    private final TextureRegion texConcreto;
+    private final TextureRegion texFogo;
+    private final TextureRegion texNeve;
+    private final TextureRegion texGrama;
+    private final TextureRegion texMoeda;
 
-    public GeradorCenario() {
-        this.tilesAtivos = new Array<>();
-        this.biomaAtual = TipoBioma.CONCRETO; // começa no concreto
+    public GeradorCenario(TextureRegion concreto, TextureRegion fogo, TextureRegion neve, TextureRegion grama, TextureRegion moeda) {
+        this.objetosAtivos = new Array<>();
+        this.biomaAtual = TipoBioma.CONCRETO;
         
+        this.texConcreto = concreto;
+        this.texFogo = fogo;
+        this.texNeve = neve;
+        this.texGrama = grama;
+        this.texMoeda = moeda;
+        
+        // gera o inicio
         for (int i = 0; i < 30; i++) {
             gerarProximoBloco();
         }
@@ -37,41 +48,37 @@ public class GeradorCenario {
             mudarDeBiomaAleatoriamente();
         }
 
-        // selecao de tiles por bioma
-        int idChaoParaCriar;
+        ObjetoDeJogo novoChao;
+        
         switch (biomaAtual) {
-            case FLORESTA:
-                idChaoParaCriar = ID_GRAMA; 
+            case FLORESTA: 
+                novoChao = new GramaTile(texGrama, proximoX, 0);
                 break;
-            case FOGO:
-                idChaoParaCriar = ID_FOGO;
+            case FOGO: 
+                novoChao = new FogoTile(texFogo, proximoX, 0);
                 break;
-            case NEVE:
-                idChaoParaCriar = ID_NEVE;
+            case NEVE: 
+                novoChao = new NeveTile(texNeve, proximoX, 0);
                 break;
             case CONCRETO:
-            default:
-                idChaoParaCriar = ID_CONCRETO;
+            default: 
+                novoChao = new ConcretoTile(texConcreto, proximoX, 0);
                 break;
         }
 
-        Tile novoChao = TileFactory.createTile(idChaoParaCriar);
-        novoChao.setPosicao(proximoX, 0);
-        tilesAtivos.add(novoChao);
-        
+        objetosAtivos.add(novoChao);
         blocosGeradosNoBiomaAtual++; 
 
-        //lLógica de Moedas
+        // moedas
         if (MathUtils.randomBoolean(0.12f)) {
             float alturaMoeda = 300f; 
             if (biomaAtual == TipoBioma.FOGO) alturaMoeda = 420f;
-            if (biomaAtual == TipoBioma.FLORESTA) alturaMoeda = 350f; 
+            if (biomaAtual == TipoBioma.FLORESTA) alturaMoeda = 350f;
             if (biomaAtual == TipoBioma.NEVE) alturaMoeda = 220f;
 
             for (int i = 0; i < 3; i++) {
-                Tile novaMoeda = TileFactory.createTile(ID_MOEDA);
-                novaMoeda.setPosicao(proximoX + (i * 35f), alturaMoeda);
-                tilesAtivos.add(novaMoeda);
+                ObjetoDeJogo novaMoeda = new MoedaTile(texMoeda, proximoX + (i * 35f), alturaMoeda);
+                objetosAtivos.add(novaMoeda);
             }
         }
 
@@ -96,20 +103,22 @@ public class GeradorCenario {
             }
         }
 
-        for (int i = tilesAtivos.size - 1; i >= 0; i--) {
-            Tile tile = tilesAtivos.get(i);
-            if (tile.getPosicao().x < jogadorX - 300) {
-                tilesAtivos.removeIndex(i);
+        for (int i = objetosAtivos.size - 1; i >= 0; i--) {
+            ObjetoDeJogo obj = objetosAtivos.get(i);
+            if (obj.getPosicao().x < jogadorX - 300) {
+                objetosAtivos.removeIndex(i);
             }
         }
     }
 
     public void renderizar(SpriteBatch batch) {
-        for (Tile tile : tilesAtivos) {
-            float tamanho = (tile.getPosicao().y > 0 && tile.ehAndavel() == false) ? 32f : TAMANHO_TILE;
-            batch.draw(tile.getTextura(), tile.getPosicao().x, tile.getPosicao().y, tamanho, tamanho);
+        for (ObjetoDeJogo obj : objetosAtivos) {
+            float tamanho = (obj instanceof MoedaTile) ? 32f : TAMANHO_TILE;
+            batch.draw(obj.getTextura(), obj.getPosicao().x, obj.getPosicao().y, tamanho, tamanho);
         }
     }
 
-    public Array<Tile> getTilesAtivos() { return tilesAtivos; }
+    public Array<ObjetoDeJogo> getObjetosAtivos() {
+        return objetosAtivos;
+    }
 }

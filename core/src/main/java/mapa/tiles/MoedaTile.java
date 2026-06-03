@@ -11,11 +11,6 @@ public class MoedaTile extends ObjetoDeJogo {
     }
 
     @Override
-    public Tile clone() {
-        return new MoedaTile(this.textura, this.posicao.x, this.posicao.y);
-    }
-
-    @Override
     public boolean ehAndavel() {
         return false; 
     }
