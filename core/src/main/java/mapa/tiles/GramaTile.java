@@ -11,11 +11,6 @@ public class GramaTile extends ObjetoDeJogo {
     }
 
     @Override
-    public Tile clone() {
-        return new GramaTile(this.textura, this.posicao.x, this.posicao.y);
-    }
-
-    @Override
     public boolean ehAndavel() {
         return true;
     }

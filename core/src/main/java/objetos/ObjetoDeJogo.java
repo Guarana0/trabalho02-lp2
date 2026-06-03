@@ -28,7 +28,4 @@ public abstract class ObjetoDeJogo implements Tile {
         this.posicao.set(x, y);
     }
 
-    //clone() como abstrato pq força cada filho a implementar o seu próprio clone 
-    @Override
-    public abstract Tile clone();
 }

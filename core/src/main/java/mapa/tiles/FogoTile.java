@@ -12,11 +12,6 @@ public class FogoTile extends ObjetoDeJogo {
     }
 
     @Override
-    public Tile clone() {
-        return new FogoTile(this.textura, this.posicao.x, this.posicao.y);
-    }
-
-    @Override
     public boolean ehAndavel() {
         return false;
     }

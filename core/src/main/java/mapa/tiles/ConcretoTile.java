@@ -11,11 +11,6 @@ public class ConcretoTile extends ObjetoDeJogo{
     }
 
     @Override
-    public Tile clone() {
-        return new ConcretoTile(this.textura, this.posicao.x, this.posicao.y);
-    }
-
-    @Override
     public boolean ehAndavel() {
         return true;
     }

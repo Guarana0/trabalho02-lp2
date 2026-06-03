@@ -11,11 +11,6 @@ public class NeveTile extends ObjetoDeJogo {
     }
 
     @Override
-    public Tile clone() {
-        return new NeveTile(this.textura, this.posicao.x, this.posicao.y);
-    }
-
-    @Override
     public boolean ehAndavel() {
         return true;
     }    
