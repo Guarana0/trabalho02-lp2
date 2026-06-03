@@ -9,5 +9,4 @@ public interface Tile extends Cloneable {
     Vector2 getPosicao();
     void setPosicao(float x, float y);
 
-    Tile clone(); //isso facilita a criação de tiles.
 }
