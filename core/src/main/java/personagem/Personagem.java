@@ -1,6 +1,7 @@
 package personagem;
 
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
@@ -12,12 +13,13 @@ public abstract class Personagem {
 	// tamanho real de todos os personagens ao longo do jogo (sem considerar armas)
 	protected Vector2 dimensoes;
 
-	// criação das variaveis de atributos variavies 
+	// criação das variaveis de atributos variavies
 	protected Vector2 velocidade;
 	protected Vector2 posicao;
 	protected Rectangle areaColisao;
 
 	protected Sound somDano;
+	protected Texture textura;
 
 	public Personagem(float x, float y, float altura, float largura, Sound somDano) {
 		this.dimensoes = new Vector2(largura, altura);
@@ -26,6 +28,12 @@ public abstract class Personagem {
 		this.areaColisao = new Rectangle(x, y, largura, altura);
 		this.estaVivo = true;
 		this.somDano = somDano;
+	}
+
+    
+
+	public Texture gettextura() {
+		return this.textura;
 	}
 
 	public Vector2 getPosicao() {
@@ -53,4 +61,19 @@ public abstract class Personagem {
 
         return this.vida;
     }
+
+	public int getVida() {
+		return vida;
+	}
+
+	// diminui a vida do personagem
+	public int tomarDano(int danoRecebido) {
+		this.vida -= danoRecebido;
+
+		if (this.vida < 0) {
+			this.vida = 0;
+		}
+
+		return this.vida;
+	}
 }

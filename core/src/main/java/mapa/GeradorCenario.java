@@ -15,6 +15,7 @@ import objetos.ObjetoDeJogo;
 public class GeradorCenario {
     private final Array<ObjetoDeJogo> objetosAtivos; 
     private float proximoX = 0;
+    private float proximoXMoeda = 200f; 
     private final float TAMANHO_TILE = 64f;
 
     private TipoBioma biomaAtual;
@@ -69,16 +70,34 @@ public class GeradorCenario {
         objetosAtivos.add(novoChao);
         blocosGeradosNoBiomaAtual++; 
 
-        // moedas
-        if (MathUtils.randomBoolean(0.12f)) {
-            float alturaMoeda = 300f; 
-            if (biomaAtual == TipoBioma.FOGO) alturaMoeda = 420f;
-            if (biomaAtual == TipoBioma.FLORESTA) alturaMoeda = 350f;
-            if (biomaAtual == TipoBioma.NEVE) alturaMoeda = 220f;
+        if (proximoX >= proximoXMoeda) {
+            if (MathUtils.randomBoolean(0.12f)) {
+                float alturaBaseMoeda = 300f; 
+                if (biomaAtual == TipoBioma.FOGO) alturaBaseMoeda = 320f;
+                if (biomaAtual == TipoBioma.FLORESTA) alturaBaseMoeda = 300f;
+                if (biomaAtual == TipoBioma.NEVE) alturaBaseMoeda = 220f;
 
-            for (int i = 0; i < 3; i++) {
-                ObjetoDeJogo novaMoeda = new MoedaTile(texMoeda, proximoX + (i * 35f), alturaMoeda);
-                objetosAtivos.add(novaMoeda);
+                int colunas = MathUtils.random(2, 10); 
+                int linhas = MathUtils.random(1, 4);   
+
+                float espacamentoX = 45f; 
+                float espacamentoY = 45f;
+
+                for (int l = 0; l < linhas; l++) {
+                    for (int c = 0; c < colunas; c++) {
+                        float posXMoeda = proximoX + (c * espacamentoX);
+                        float posYMoeda = alturaBaseMoeda + (l * espacamentoY);
+
+                        ObjetoDeJogo novaMoeda = new MoedaTile(texMoeda, posXMoeda, posYMoeda);
+                        objetosAtivos.add(novaMoeda);
+                    }
+                }
+
+                float fimDaFileiraX = proximoX + (colunas * espacamentoX);
+                proximoXMoeda = fimDaFileiraX + 300f;
+
+            } else {
+                proximoXMoeda = proximoX + TAMANHO_TILE;
             }
         }
 
@@ -97,10 +116,9 @@ public class GeradorCenario {
     }
 
     public void atualizar(float jogadorX) {
-        if (jogadorX > proximoX - 1500) { 
-            for (int i = 0; i < 10; i++) {
-                gerarProximoBloco();
-            }
+
+        while (jogadorX > proximoX - 1500) { 
+            gerarProximoBloco();
         }
 
         for (int i = objetosAtivos.size - 1; i >= 0; i--) {
@@ -111,10 +129,13 @@ public class GeradorCenario {
         }
     }
 
-    public void renderizar(SpriteBatch batch) {
+    public void renderizar(SpriteBatch batch, float jogadorX) {
         for (ObjetoDeJogo obj : objetosAtivos) {
             float tamanho = (obj instanceof MoedaTile) ? 32f : TAMANHO_TILE;
-            batch.draw(obj.getTextura(), obj.getPosicao().x, obj.getPosicao().y, tamanho, tamanho);
+
+            float posXNaTela = obj.getPosicao().x - jogadorX + 100f;
+
+            batch.draw(obj.getTextura(), posXNaTela, obj.getPosicao().y, tamanho, tamanho);
         }
     }
 
