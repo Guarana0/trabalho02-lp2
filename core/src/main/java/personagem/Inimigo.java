@@ -7,6 +7,8 @@ import com.badlogic.gdx.math.MathUtils;
 public abstract class Inimigo extends Personagem {
     protected int vida = 1;
 
+    
+
     public Inimigo(float larguraMapa, float alturaMapa, float altura, float largura, Sound somDano) {
         super(
             // geração aleatoria da psoição do inimigo consulta no StackOverflow: Enemy spawning problem [closed]

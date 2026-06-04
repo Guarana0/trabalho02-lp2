@@ -30,6 +30,8 @@ public abstract class Personagem {
 		this.somDano = somDano;
 	}
 
+    
+
 	public Texture gettextura() {
 		return this.textura;
 	}
@@ -55,8 +57,8 @@ public abstract class Personagem {
 	}
 
 	// diminui a vida do personagem
-	public int darDano(int dano) {
-		this.vida -= dano;
+	public int tomarDano(int danoRecebido) {
+		this.vida -= danoRecebido;
 
 		if (this.vida < 0) {
 			this.vida = 0;
