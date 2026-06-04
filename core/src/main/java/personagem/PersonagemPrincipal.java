@@ -33,6 +33,8 @@ public class PersonagemPrincipal extends Personagem {
     // velocidade que o personagem corre em X
     private final float VELOCIDADE_CORRIDA = 205f;
 
+    private float distanciaPercorrida = 0f;
+
     public PersonagemPrincipal(float x, float y, float altura, float largura, Sound somDano) {
         super(x, y, altura, largura, somDano);
         this.protegidoPorEscudo = false;
@@ -44,6 +46,10 @@ public class PersonagemPrincipal extends Personagem {
 
     public void setProtegidoPorEscudo(boolean protegidoPorEscudo) {
         this.protegidoPorEscudo = protegidoPorEscudo;
+    }
+
+    public float getDistanciaPercorrida() {
+        return distanciaPercorrida;
     }
 
     /*
@@ -77,6 +83,7 @@ public class PersonagemPrincipal extends Personagem {
         float novoY = posicao.y + (velocidadeY * deltaTempo);
 
         float novoX = posicao.x + (VELOCIDADE_CORRIDA * deltaTempo);
+        distanciaPercorrida += VELOCIDADE_CORRIDA * deltaTempo;
 
         // caso o personagem tente afundar pra dps do chao, eu travo ele no chao pra
         // evitar bugs
@@ -104,7 +111,8 @@ public class PersonagemPrincipal extends Personagem {
             return this.vida;
         }
 
-        // Se não tiver escudo, executa o comportamento padrão da classe mãe (perder vida)
+        // Se não tiver escudo, executa o comportamento padrão da classe mãe (perder
+        // vida)
         return super.tomarDano(danoRecebido);
     }
 
