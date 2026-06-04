@@ -99,10 +99,12 @@ public class PersonagemPrincipal extends Personagem {
 
     @Override
     public int tomarDano(int danoRecebido) {
-        if (getProtegidoPorEscudo()) {
+        // Se o escudo estiver ativo, ignora o dano completamente e retorna a vida atual
+        if (this.protegidoPorEscudo) {
             return this.vida;
         }
 
+        // Se não tiver escudo, executa o comportamento padrão da classe mãe (perder vida)
         return super.tomarDano(danoRecebido);
     }
 
