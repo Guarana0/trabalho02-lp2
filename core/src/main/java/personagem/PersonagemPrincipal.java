@@ -8,6 +8,7 @@ public class PersonagemPrincipal extends Personagem {
     // variaveis para verificar a mudança de state ao longo do jogo
     private boolean apertouD, apertouS, apertouEsp;
     private boolean clickDir, clickEsq;
+    private boolean protegidoPorEscudo;
 
     private int vida = 3;
     /*
@@ -34,6 +35,15 @@ public class PersonagemPrincipal extends Personagem {
 
     public PersonagemPrincipal(float x, float y, float altura, float largura, Sound somDano) {
         super(x, y, altura, largura, somDano);
+        this.protegidoPorEscudo = false;
+    }
+
+    public boolean getProtegidoPorEscudo() {
+        return protegidoPorEscudo;
+    }
+
+    public void setProtegidoPorEscudo(boolean protegidoPorEscudo) {
+        this.protegidoPorEscudo = protegidoPorEscudo;
     }
 
     /*
@@ -85,6 +95,17 @@ public class PersonagemPrincipal extends Personagem {
         // atualizei a caixa de colisao pra ela ficar colada no personagem
         areaColisao.setPosition(novoX, novoY);
 
+    }
+
+    @Override
+    public int tomarDano(int danoRecebido) {
+        // Se o escudo estiver ativo, ignora o dano completamente e retorna a vida atual
+        if (this.protegidoPorEscudo) {
+            return this.vida;
+        }
+
+        // Se não tiver escudo, executa o comportamento padrão da classe mãe (perder vida)
+        return super.tomarDano(danoRecebido);
     }
 
 }
