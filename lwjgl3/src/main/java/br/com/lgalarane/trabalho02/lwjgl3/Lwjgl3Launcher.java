@@ -3,7 +3,7 @@ package br.com.lgalarane.trabalho02.lwjgl3;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 
-import br.com.lgalarane.trabalho02.Jogo;
+import br.com.lgalarane.trabalho02.Main;
 
 /** Launches the desktop (LWJGL3) application. */
 public class Lwjgl3Launcher {
@@ -12,7 +12,9 @@ public class Lwjgl3Launcher {
         createApplication();
     } 
     private static Lwjgl3Application createApplication() {
-        return new Lwjgl3Application(new Jogo(), getDefaultConfiguration());
+        // Antes o launcher inicializava `Jogo` direto e pulava o menu
+        // Agora eu criei `Main` (que gerencia telas) pra mostrar o menu na inicialização do nosso joguinho:)
+        return new Lwjgl3Application(new Main(), getDefaultConfiguration());
     }
 
     private static Lwjgl3ApplicationConfiguration getDefaultConfiguration() {
