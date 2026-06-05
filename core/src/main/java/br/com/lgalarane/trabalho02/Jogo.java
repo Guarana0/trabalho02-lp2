@@ -15,7 +15,7 @@ public class Jogo extends ApplicationAdapter {
     private SpriteBatch batch;
     private BitmapFont font;
     private GeradorCenario geradorCenario;
-    private float jogadorX = 0f; // temporario
+    private float jogadorX = 0f;
 
     private Texture texConcreto;
     private Texture texFogo;
