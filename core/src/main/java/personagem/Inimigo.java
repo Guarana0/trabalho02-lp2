@@ -14,20 +14,22 @@ public abstract class Inimigo extends Personagem {
             largura,
             somDano
         );
-        this.dano = 1; // Define o dano padrão do inimigo na classe mãe
-        this.vida = 1; // Altera a vida herdada da classe mãe
+        this.dano = 1;
+        this.vida = 1;
+
     }
 
     public void darDano(Personagem alvo) {
         // Garante que o alvo e as caixas de colisão existem
         if (alvo != null && this.getColisao() != null && alvo.getColisao() != null) {
-            
             // Verifica se a caixa de colisão do inimigo encostou na do alvo
             if (this.getColisao().overlaps(alvo.getColisao())) {
-                
-                // Faz o alvo tomar dano
                 alvo.tomarDano(this.dano);
             }
         }
+    }
+
+    public void gerarInimigo() {
+        
     }
 }
