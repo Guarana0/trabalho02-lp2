@@ -19,7 +19,6 @@ public class PersonagemPrincipal extends Personagem {
     private float velocidadeY = 0f;
 
     private final float ALTURA_CHAO = 50f;
-    private final float ALTURA_TETO = 500f;
     private final float VELOCIDADE_CORRIDA = 20f;
     private float distanciaPercorrida = 0f;
 
@@ -33,7 +32,7 @@ public class PersonagemPrincipal extends Personagem {
     public void setProtegidoPorEscudo(boolean protegidoPorEscudo) { this.protegidoPorEscudo = protegidoPorEscudo; }
     public float getDistanciaPercorrida() { return distanciaPercorrida; }
 
-    public void atualizar(float deltaTempo) {
+    public void atualizar(float deltaTempo, float velocidadeMapa) {
         apertouEsp = Gdx.input.isKeyPressed(Input.Keys.SPACE) || Gdx.input.isTouched();
         
         if (apertouEsp) {
@@ -46,14 +45,17 @@ public class PersonagemPrincipal extends Personagem {
         if (velocidadeY < -VELOCIDADE_MAIXIMA) { velocidadeY = -VELOCIDADE_MAIXIMA; }
 
         float novoY = posicao.y + (velocidadeY * deltaTempo);
-        float novoX = posicao.x + (VELOCIDADE_CORRIDA * deltaTempo);
-        distanciaPercorrida += VELOCIDADE_CORRIDA * deltaTempo;
+        float velocidadeHorizontal = Math.min(VELOCIDADE_CORRIDA, velocidadeMapa);
+        float novoX = posicao.x + (velocidadeHorizontal * deltaTempo);
+        distanciaPercorrida += velocidadeHorizontal * deltaTempo;
+
+        float alturaTetoTela = Gdx.graphics.getHeight() - dimensoes.y;
 
         if (novoY < ALTURA_CHAO) {
             novoY = ALTURA_CHAO;
             velocidadeY = 0;
-        } else if (novoY > ALTURA_TETO) {
-            novoY = ALTURA_TETO;
+        } else if (novoY > alturaTetoTela) {
+            novoY = alturaTetoTela;
             velocidadeY = 0;
         }
 

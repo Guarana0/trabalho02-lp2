@@ -63,7 +63,7 @@ public class Jogo extends ApplicationAdapter {
 
         float delta = Gdx.graphics.getDeltaTime();
 
-        personagem.atualizar(delta);
+        personagem.atualizar(delta, VELOCIDADE_MAPA);
 
         posicaoMapaX += VELOCIDADE_MAPA * delta;
 
