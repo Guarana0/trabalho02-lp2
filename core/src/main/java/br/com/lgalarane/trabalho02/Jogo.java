@@ -35,6 +35,9 @@ public class Jogo extends ApplicationAdapter {
         // usa do polimorfismo para criar cada inimigo - NAO FOI TERMINADO DE IMPLEMENTAR AINDA
         listaInimigos = new ArrayList<Inimigo>();
 
+        assets = new GameAssets();
+        assets.carregaTodosAssets();
+
         listaInimigos.add(new Esqueleto(VELOCIDADE_MAPA, VELOCIDADE_MAPA, posicaoMapaX, VELOCIDADE_MAPA, assets.somDano));
         listaInimigos.add(new Corvo(VELOCIDADE_MAPA, VELOCIDADE_MAPA, posicaoMapaX, VELOCIDADE_MAPA, assets.somDano));
 
@@ -42,9 +45,6 @@ public class Jogo extends ApplicationAdapter {
         shapeRenderer = new ShapeRenderer(); 
         font = new BitmapFont();
         font.setColor(Color.WHITE);
-
-        assets = new GameAssets();
-        assets.carregaTodosAssets();
 
         geradorCenario = new GeradorCenario(
             assets.texRegConcreto, 
