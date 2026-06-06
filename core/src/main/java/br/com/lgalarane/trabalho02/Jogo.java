@@ -4,13 +4,17 @@ import java.util.ArrayList;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.ScreenUtils;
+
 import mapa.GeradorCenario;
+import mapa.TipoBioma;
+import mapa.planosdefundo.GeradorFundo;
 import mapa.tiles.MoedaTile;
 import objetos.ObjetoDeJogo;
 import personagem.Inimigo;
@@ -23,6 +27,7 @@ public class Jogo extends ApplicationAdapter {
     private ShapeRenderer shapeRenderer; 
     private BitmapFont font;
     private GeradorCenario geradorCenario;
+    private GeradorFundo geradorFundo;
     
     private GameAssets assets;
     private PersonagemPrincipal personagem; 
@@ -31,13 +36,11 @@ public class Jogo extends ApplicationAdapter {
 
     private Rectangle areaMoeda;
 
-    // controla a velocidade independente do personagem
     private float posicaoMapaX = 0f;
-    private final float VELOCIDADE_MAPA = 70f; 
+    private final float VELOCIDADE_MAPA = 150f; 
 
     @Override
     public void create() {
-        // usa do polimorfismo para criar cada inimigo - NAO FOI TERMINADO DE IMPLEMENTAR AINDA
         listaInimigos = new ArrayList<Inimigo>();
 
         assets = new GameAssets();
@@ -59,6 +62,13 @@ public class Jogo extends ApplicationAdapter {
             assets.texRegMoeda
         );
 
+        geradorFundo = new GeradorFundo(
+            assets.texRegFundoGrama,
+            assets.texRegFundoFogo,
+            assets.texRegFundoNeve,
+            assets.texRegFundoConcreto
+        );
+
         personagem = new PersonagemPrincipal(0f, 100f, 40f, 40f, assets.somDano);
         areaMoeda = new Rectangle();
     }
@@ -75,27 +85,41 @@ public class Jogo extends ApplicationAdapter {
 
         geradorCenario.atualizar(posicaoMapaX);
         verificarColetaMoedas();
+        verificarInputGranada();
 
         batch.begin();
 
-        // O cenário renderiza baseado na posição independente do mapa
+        TipoBioma biomaAtivo = geradorCenario.getBiomaSobOJogador(posicaoMapaX);
+        geradorFundo.renderizar(batch, biomaAtivo);
+
         geradorCenario.renderizar(batch, posicaoMapaX);
 
         int distancia = (int) personagem.getDistanciaPercorrida();
         int vida = personagem.getVida();
         int moedas = personagem.getMoeda();
+        int granadas = personagem.getQtdGranadas();
 
-        font.draw(batch, "Distância: " + distancia + "m", 10, Gdx.graphics.getHeight() - 10);
+        font.draw(batch, "Distancia: " + distancia + "m", 10, Gdx.graphics.getHeight() - 10);
         font.draw(batch, "Vida: " + vida, 10, Gdx.graphics.getHeight() - 30);
         font.draw(batch, "Moedas: " + moedas, 10, Gdx.graphics.getHeight() - 50);
+        
+        batch.draw(assets.texRegGranada, 10, Gdx.graphics.getHeight() - 95, 24, 24);
+        font.draw(batch, "x" + granadas, 40, Gdx.graphics.getHeight() - 78);
 
         batch.end();
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-
         personagem.renderizar(shapeRenderer);
-        
         shapeRenderer.end();
+    }
+
+    private void verificarInputGranada() {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.G)) {
+            int granadasAtuais = personagem.getQtdGranadas();
+            if (granadasAtuais > 0) {
+                personagem.setQtdGranadas(granadasAtuais - 1);
+            }
+        }
     }
 
     private void verificarColetaMoedas() {

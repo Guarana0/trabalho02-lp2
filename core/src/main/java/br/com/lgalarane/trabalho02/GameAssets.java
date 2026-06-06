@@ -6,46 +6,66 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class GameAssets {
-    private final AssetManager managerAsset = new AssetManager();
+    private AssetManager managerAsset;
 
-    public Sound somPulo;
     public Sound somDano;
 
-    // Guardaremos as TextureRegions prontas para o jogo usar
     public TextureRegion texRegConcreto;
     public TextureRegion texRegFogo;
     public TextureRegion texRegNeve;
     public TextureRegion texRegGrama;
-    public TextureRegion texRegMoeda;
+    public TextureRegion taxRegMoeda; 
+    public TextureRegion texRegMoeda;  
+    public TextureRegion texRegGranada;
+
+    public TextureRegion texRegFundoGrama;
+    public TextureRegion texRegFundoFogo;
+    public TextureRegion texRegFundoNeve;
+    public TextureRegion texRegFundoConcreto;
+
+    public GameAssets() {
+        this.managerAsset = new AssetManager();
+    }
 
     public void carregaTodosAssets() {
-        // Carregando os Sons
         managerAsset.load("fontes/dano.wav", Sound.class);
-        managerAsset.load("fontes/pulo.wav", Sound.class);
 
-        // Carregando as Texturas (AssetManager carrega o arquivo como Texture)
         managerAsset.load("textures/concreto.png", Texture.class);
         managerAsset.load("textures/fogo.png", Texture.class);
         managerAsset.load("textures/neve.png", Texture.class);
         managerAsset.load("textures/grama.png", Texture.class);
         managerAsset.load("textures/moeda.png", Texture.class);
+        managerAsset.load("textures/granada.png", Texture.class); 
 
-        // Bloqueia a execução até que tudo seja carregado
+        managerAsset.load("textures/gramafundo.png", Texture.class);
+        managerAsset.load("textures/fogofundo.png", Texture.class);
+        managerAsset.load("textures/nevefundo.png", Texture.class);
+        managerAsset.load("textures/concretofundo.png", Texture.class);
+
         managerAsset.finishLoading();
 
-        // Atribuindo os sons
-        somPulo = managerAsset.get("fontes/pulo.wav", Sound.class);
         somDano = managerAsset.get("fontes/dano.wav", Sound.class);
 
-        // Criando as TextureRegions a partir das Textures carregadas
         texRegConcreto = new TextureRegion(managerAsset.get("textures/concreto.png", Texture.class));
         texRegFogo = new TextureRegion(managerAsset.get("textures/fogo.png", Texture.class));
         texRegNeve = new TextureRegion(managerAsset.get("textures/neve.png", Texture.class));
         texRegGrama = new TextureRegion(managerAsset.get("textures/grama.png", Texture.class));
-        texRegMoeda = new TextureRegion(managerAsset.get("textures/moeda.png", Texture.class));
+        
+        Texture moedaTex = managerAsset.get("textures/moeda.png", Texture.class);
+        texRegMoeda = new TextureRegion(moedaTex);
+        taxRegMoeda = new TextureRegion(moedaTex);
+        
+        texRegGranada = new TextureRegion(managerAsset.get("textures/granada.png", Texture.class));
+
+        texRegFundoGrama = new TextureRegion(managerAsset.get("textures/gramafundo.png", Texture.class));
+        texRegFundoFogo = new TextureRegion(managerAsset.get("textures/fogofundo.png", Texture.class));
+        texRegFundoNeve = new TextureRegion(managerAsset.get("textures/nevefundo.png", Texture.class));
+        texRegFundoConcreto = new TextureRegion(managerAsset.get("textures/concretofundo.png", Texture.class));
     }
 
     public void limparAssets() {
-        managerAsset.dispose();
+        if (managerAsset != null) {
+            managerAsset.dispose();
+        }
     }
 }

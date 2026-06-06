@@ -5,13 +5,13 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Rectangle;
 
 public class PersonagemPrincipal extends Personagem {
     private boolean apertouEsp;
     private boolean protegidoPorEscudo;
 
     private int moeda = 0;
+    private int qtdGranadas=5;
 
     private final float GRAVIDADE = -500f;
     private final float FORCA_JETPACK = 1000f;
@@ -93,4 +93,17 @@ public class PersonagemPrincipal extends Personagem {
     public int getVida() {
         return vida;
     }
+
+    //granadas
+    public int getQtdGranadas() {
+        return qtdGranadas;
+    }
+
+    public void setQtdGranadas(int qtdGranadas) {
+        this.qtdGranadas = qtdGranadas;
+    }
+
+
+
+
 }

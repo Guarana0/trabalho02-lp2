@@ -38,7 +38,6 @@ public class GeradorCenario {
         this.texGrama = grama;
         this.texMoeda = moeda;
         
-        // gera o inicio
         for (int i = 0; i < 30; i++) {
             gerarProximoBloco();
         }
@@ -51,20 +50,15 @@ public class GeradorCenario {
 
         ObjetoDeJogo novoChao;
         
-        switch (biomaAtual) {
-            case FLORESTA: 
-                novoChao = new GramaTile(texGrama, proximoX, 0);
-                break;
-            case FOGO: 
-                novoChao = new FogoTile(texFogo, proximoX, 0);
-                break;
-            case NEVE: 
-                novoChao = new NeveTile(texNeve, proximoX, 0);
-                break;
-            case CONCRETO:
-            default: 
-                novoChao = new ConcretoTile(texConcreto, proximoX, 0);
-                break;
+        String nomeBioma = biomaAtual.name();
+        if (nomeBioma.equals("FLORESTA") || nomeBioma.equals("GRAMA")) {
+            novoChao = new GramaTile(texGrama, proximoX, 0);
+        } else if (nomeBioma.equals("FOGO")) {
+            novoChao = new FogoTile(texFogo, proximoX, 0);
+        } else if (nomeBioma.equals("NEVE")) {
+            novoChao = new NeveTile(texNeve, proximoX, 0);
+        } else {
+            novoChao = new ConcretoTile(texConcreto, proximoX, 0);
         }
 
         objetosAtivos.add(novoChao);
@@ -73,9 +67,9 @@ public class GeradorCenario {
         if (proximoX >= proximoXMoeda) {
             if (MathUtils.randomBoolean(0.12f)) {
                 float alturaBaseMoeda = 300f; 
-                if (biomaAtual == TipoBioma.FOGO) alturaBaseMoeda = 320f;
-                if (biomaAtual == TipoBioma.FLORESTA) alturaBaseMoeda = 300f;
-                if (biomaAtual == TipoBioma.NEVE) alturaBaseMoeda = 220f;
+                if (nomeBioma.equals("FOGO")) alturaBaseMoeda = 320f;
+                if (nomeBioma.equals("FLORESTA") || nomeBioma.equals("GRAMA")) alturaBaseMoeda = 300f;
+                if (nomeBioma.equals("NEVE")) alturaBaseMoeda = 220f;
 
                 int colunas = MathUtils.random(2, 10); 
                 int linhas = MathUtils.random(1, 4);   
@@ -116,7 +110,6 @@ public class GeradorCenario {
     }
 
     public void atualizar(float jogadorX) {
-
         while (jogadorX > proximoX - 1500) { 
             gerarProximoBloco();
         }
@@ -132,14 +125,36 @@ public class GeradorCenario {
     public void renderizar(SpriteBatch batch, float jogadorX) {
         for (ObjetoDeJogo obj : objetosAtivos) {
             float tamanho = (obj instanceof MoedaTile) ? 32f : TAMANHO_TILE;
-
             float posXNaTela = obj.getPosicao().x - jogadorX + 100f;
-
             batch.draw(obj.getTextura(), posXNaTela, obj.getPosicao().y, tamanho, tamanho);
         }
     }
 
     public Array<ObjetoDeJogo> getObjetosAtivos() {
         return objetosAtivos;
+    }
+
+    public TipoBioma getBiomaSobOJogador(float jogadorX) {
+        for (ObjetoDeJogo obj : objetosAtivos) {
+            if (!(obj instanceof MoedaTile)) {
+                float limiteEsquerdo = obj.getPosicao().x;
+                float limiteDireito = limiteEsquerdo + TAMANHO_TILE;
+
+                if (jogadorX >= limiteEsquerdo && jogadorX <= limiteDireito) {
+                    String nomeClasse = obj.getClass().getSimpleName();
+                    
+                    if (nomeClasse.equals("GramaTile")) {
+                        return TipoBioma.FLORESTA;
+                    } else if (nomeClasse.equals("FogoTile")) {
+                        return TipoBioma.FOGO;
+                    } else if (nomeClasse.equals("NeveTile")) {
+                        return TipoBioma.NEVE;
+                    } else if (nomeClasse.equals("ConcretoTile")) {
+                        return TipoBioma.CONCRETO;
+                    }
+                }
+            }
+        }
+        return biomaAtual;
     }
 }
