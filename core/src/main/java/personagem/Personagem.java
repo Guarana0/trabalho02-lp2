@@ -4,11 +4,16 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import java.lang.ref.Cleaner;
 
 public abstract class Personagem {
     protected int vida;
     protected boolean estaVivo;
     protected int dano;
+
+    // tudo relacionado ao clean foi implementado com ia 
+    protected static final Cleaner cleaner = Cleaner.create();
+    private Cleaner.Cleanable cleanable;
 
     protected Vector2 dimensoes;
     protected Vector2 velocidade;
@@ -17,6 +22,27 @@ public abstract class Personagem {
 
     protected Sound somDano;
     protected Texture textura;
+
+    // USO DE IA PARA O CLEAN
+    private static class EstadoLimpeza implements Runnable {
+        private final Texture tex;
+        private final Sound som;
+
+        public EstadoLimpeza(Texture tex, Sound som) {
+            this.tex = tex;
+            this.som = som;
+        }
+
+        @Override
+        public void run() {
+            if (tex != null) {
+                tex.dispose();
+            }
+            if (som != null) {
+                som.dispose();
+            }
+        }
+    }
 
     public Personagem(float x, float y, float largura, float altura, Sound somDano) {
         this.dimensoes = new Vector2(largura, altura);
@@ -27,6 +53,18 @@ public abstract class Personagem {
         this.somDano = somDano;
     }
 
+    // USO DE IA 
+    protected void inicializarLimpeza() {
+        this.cleanable = cleaner.register(this, new EstadoLimpeza(this.textura, this.somDano));
+    }
+
+    // USO DE IA 
+    public void destruir() {
+        if (cleanable != null) {
+            cleanable.clean();
+        }
+    }
+
     public Texture gettextura() {
         return this.textura;
     }
@@ -35,7 +73,6 @@ public abstract class Personagem {
         return posicao;
     }
 
-    // CORRIGIDO: Removido o modificador 'static'
     public Vector2 getDimensoes() {
         return dimensoes;
     }
@@ -46,6 +83,10 @@ public abstract class Personagem {
 
     public int getDano() {
         return dano;
+    }
+
+    public boolean getAtivo() {
+        return estaVivo;
     }
 
     public int darDano(int dano) {

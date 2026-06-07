@@ -19,7 +19,6 @@ public class PersonagemPrincipal extends Personagem {
     private float velocidadeY = 0f;
 
     private final float ALTURA_CHAO = 50f;
-    private final float VELOCIDADE_CORRIDA = 20f;
     private final float POSICAO_FIXA_TELA_X = 100f;
     private float distanciaPercorrida = 0f;
 
@@ -46,7 +45,6 @@ public class PersonagemPrincipal extends Personagem {
         if (velocidadeY < -VELOCIDADE_MAIXIMA) { velocidadeY = -VELOCIDADE_MAIXIMA; }
 
         float novoY = posicao.y + (velocidadeY * deltaTempo);
-        float velocidadeHorizontal = Math.min(VELOCIDADE_CORRIDA, velocidadeMapa);
         distanciaPercorrida += velocidadeMapa * deltaTempo;
 
         float alturaTetoTela = Gdx.graphics.getHeight() - dimensoes.y;

@@ -41,13 +41,12 @@ public class Jogo extends ApplicationAdapter {
 
     @Override
     public void create() {
+        float larguraMundo = Gdx.graphics.getWidth(); // Ou o tamanho real do seu mapa/tela
+        float alturaMundo = Gdx.graphics.getHeight();
         listaInimigos = new ArrayList<Inimigo>();
 
         assets = new GameAssets();
         assets.carregaTodosAssets();
-
-        listaInimigos.add(new Esqueleto(VELOCIDADE_MAPA, VELOCIDADE_MAPA, posicaoMapaX, VELOCIDADE_MAPA, assets.somDano));
-        listaInimigos.add(new Corvo(VELOCIDADE_MAPA, VELOCIDADE_MAPA, posicaoMapaX, VELOCIDADE_MAPA, assets.somDano));
 
         batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer(); 
@@ -71,6 +70,9 @@ public class Jogo extends ApplicationAdapter {
 
         personagem = new PersonagemPrincipal(0f, 100f, 40f, 40f, assets.somDano);
         areaMoeda = new Rectangle();
+
+        listaInimigos.add(new Esqueleto(larguraMundo, alturaMundo, posicaoMapaX, VELOCIDADE_MAPA, assets.somDano));
+        listaInimigos.add(new Corvo(larguraMundo, alturaMundo, posicaoMapaX, VELOCIDADE_MAPA, assets.somDano));
     }
 
     @Override
@@ -94,6 +96,11 @@ public class Jogo extends ApplicationAdapter {
 
         geradorCenario.renderizar(batch, posicaoMapaX);
 
+         for (Inimigo inimigo : listaInimigos) {
+            inimigo.update(delta);
+            inimigo.darDano(personagem);
+        }
+
         int distancia = (int) personagem.getDistanciaPercorrida();
         int vida = personagem.getVida();
         int moedas = personagem.getMoeda();
@@ -110,6 +117,9 @@ public class Jogo extends ApplicationAdapter {
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         personagem.renderizar(shapeRenderer);
+        for (Inimigo inimigo : listaInimigos) {
+            inimigo.renderizar(shapeRenderer); // Chama a função render de cada inimigo
+        }
         shapeRenderer.end();
     }
 
