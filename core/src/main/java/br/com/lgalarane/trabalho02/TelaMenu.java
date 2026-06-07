@@ -17,10 +17,9 @@ public class TelaMenu extends ScreenAdapter {
     private final Game jogo;
     private SpriteBatch lote;
     private ShapeRenderer forma;
-    private BitmapFont fonteTitulo;
-    private BitmapFont fonteTexto;
+    private BitmapFont fonteTitulo, fonteTexto;
     private GlyphLayout layout;
-    private float tempoPulsante;
+    private float tempo;
 
     public TelaMenu(Game jogo) {
         this.jogo = jogo;
@@ -30,102 +29,69 @@ public class TelaMenu extends ScreenAdapter {
     public void show() {
         lote = new SpriteBatch();
         forma = new ShapeRenderer();
+        layout = new GlyphLayout();
 
         fonteTitulo = new BitmapFont();
-        fonteTitulo.getData().setScale(2.4f);
-        fonteTitulo.setColor(Color.BLACK);
-
+        fonteTitulo.getData().setScale(3.0f);
         fonteTexto = new BitmapFont();
-        fonteTexto.getData().setScale(1.05f);
-        fonteTexto.setColor(Color.BLACK);
-
-        layout = new GlyphLayout();
+        fonteTexto.getData().setScale(1.2f);
     }
 
     @Override
     public void render(float delta) {
-        tempoPulsante += delta;
-        ScreenUtils.clear(0.03f, 0.08f, 0.18f, 1f);
+        tempo += delta;
+        ScreenUtils.clear(0.05f, 0.05f, 0.1f, 1f);
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER) || Gdx.input.justTouched()) {
             jogo.setScreen(new JogoScreen(jogo));
             return;
         }
 
-        float largura = Gdx.graphics.getWidth();
-        float altura = Gdx.graphics.getHeight();
-        float painelLargura = largura * 0.74f;
-        float painelAltura = 250f;
-        float painelX = (largura - painelLargura) / 2f;
-        float painelY = (altura - painelAltura) / 2f;
+        float w = Gdx.graphics.getWidth();
+        float h = Gdx.graphics.getHeight();
 
-        // Fundo escuro com elementos inspirados em mapa
+        // DEGRADE DO FUNDO
         forma.begin(ShapeType.Filled);
-        forma.setColor(0.04f, 0.10f, 0.22f, 1f);
-        forma.rect(0, 0, largura, altura);
+        forma.rect(0, 0, w, h, new Color(0.05f, 0.05f, 0.15f, 1), new Color(0.05f, 0.05f, 0.15f, 1),
+                new Color(0.1f, 0.1f, 0.25f, 1), new Color(0.1f, 0.1f, 0.25f, 1));
 
-        forma.setColor(0.08f, 0.18f, 0.34f, 1f);
-        forma.circle(largura * 0.18f, altura * 0.78f, 110f);
-        forma.circle(largura * 0.82f, altura * 0.24f, 70f);
-        forma.circle(largura * 0.62f, altura * 0.70f, 50f);
+        // 2. Painel Central Estilizado
+        float pW = w * 0.6f, pH = 200f;
+        float pX = (w - pW) / 2f, pY = (h - pH) / 2f;
 
-        forma.setColor(0.16f, 0.28f, 0.50f, 1f);
-        forma.rect(painelX, painelY, painelLargura, painelAltura);
-        forma.setColor(0.24f, 0.44f, 0.72f, 1f);
-        forma.rect(painelX, painelY + painelAltura - 52f, painelLargura, 52f);
-
-        forma.setColor(1f, 1f, 1f, 0.12f);
-        forma.rect(painelX + 18f, painelY + 18f, painelLargura - 36f, painelAltura - 36f);
-
-        forma.setColor(0.14f, 0.30f, 0.56f, 1f);
-        forma.rect(painelX, painelY, painelLargura, 4f);
-        forma.rect(painelX, painelY + painelAltura - 4f, painelLargura, 4f);
-        forma.rect(painelX, painelY, 4f, painelAltura);
-        forma.rect(painelX + painelLargura - 4f, painelY, 4f, painelAltura);
+        forma.setColor(0.1f, 0.15f, 0.3f, 0.8f);
+        forma.rect(pX, pY, pW, pH); // Fundo do painel
+        forma.setColor(0.2f, 0.4f, 0.6f, 0.3f);
+        forma.rect(pX, pY + pH - 5, pW, 5); // Borda superior
         forma.end();
 
-        float brilho = 0.74f + 0.16f * MathUtils.sin(tempoPulsante * 2.7f);
-        Color acento = new Color(0.55f, 0.85f, 1f, brilho);
-
-        String titulo = "MENU DO NOSSO JOGO";
-        String subtitulo = "AINDA VAMOS DEFINIR UMA LEGENDA PRO SUBTITULO :)";
-        String instrucoes = "PRESSIONE ENTER OU TOQUE PARA INICIAR";
-
         lote.begin();
-        layout.setText(fonteTitulo, titulo);
-        float tituloX = (largura - layout.width) / 2f;
-        float tituloY = painelY + painelAltura - 16f;
+        String titulo = "MENU PRINCIPAL";
+        String instrucao = "CÇIQUE OU PRESSIONE ENTER PARA INICIAR";
 
-        fonteTitulo.setColor(new Color(0.12f, 0.20f, 0.30f, 0.5f));
-        fonteTitulo.draw(lote, titulo, tituloX + 4f, tituloY - 4f);
-        fonteTitulo.setColor(Color.BLACK);
-        fonteTitulo.draw(lote, titulo, tituloX, tituloY);
+        // Efeito de brilho na instrução
+        float alpha = 0.5f + 0.5f * MathUtils.sin(tempo * 3f);
 
-        fonteTexto.setColor(Color.BLACK);
-        layout.setText(fonteTexto, subtitulo);
-        float subtituloX = (largura - layout.width) / 2f;
-        fonteTexto.draw(lote, subtitulo, subtituloX, painelY + painelAltura - 76f);
+        desenharTextoSombreado(titulo, fonteTitulo, h * 0.6f, Color.WHITE, Color.BLACK);
+        desenharTextoSombreado(instrucao, fonteTexto, h * 0.4f, new Color(1, 1, 1, alpha), Color.BLACK);
 
-        fonteTexto.setColor(new Color(0.10f, 0.28f, 0.46f, 1f));
-        layout.setText(fonteTexto, instrucoes);
-        float instrucoesX = (largura - layout.width) / 2f;
-        fonteTexto.draw(lote, instrucoes, instrucoesX, painelY + 54f);
         lote.end();
+    }
+
+    private void desenharTextoSombreado(String texto, BitmapFont fonte, float y, Color cor, Color sombra) {
+        layout.setText(fonte, texto);
+        float x = (Gdx.graphics.getWidth() - layout.width) / 2f;
+        fonte.setColor(sombra);
+        fonte.draw(lote, texto, x + 2, y - 2); // Sombra
+        fonte.setColor(cor);
+        fonte.draw(lote, texto, x, y); // Texto principal
     }
 
     @Override
     public void dispose() {
-        if (lote != null) {
-            lote.dispose();
-        }
-        if (forma != null) {
-            forma.dispose();
-        }
-        if (fonteTitulo != null) {
-            fonteTitulo.dispose();
-        }
-        if (fonteTexto != null) {
-            fonteTexto.dispose();
-        }
+        lote.dispose();
+        forma.dispose();
+        fonteTitulo.dispose();
+        fonteTexto.dispose();
     }
 }
