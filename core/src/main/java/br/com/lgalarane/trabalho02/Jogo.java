@@ -1,8 +1,9 @@
 package br.com.lgalarane.trabalho02;
 
 import java.util.ArrayList;
+
 import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Game; // Importado
+import com.badlogic.gdx.Game; 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
@@ -12,19 +13,19 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.ScreenUtils;
-
 import mapa.GeradorCenario;
 import mapa.TipoBioma;
 import mapa.planosdefundo.GeradorFundo;
 import mapa.tiles.MoedaTile;
 import objetos.ObjetoDeJogo;
 import personagem.Inimigo;
-import personagem.PersonagemPrincipal;
 import personagem.Inimigos.Corvo;
 import personagem.Inimigos.Esqueleto;
+import personagem.PersonagemPrincipal;
+
 
 public class Jogo extends ApplicationAdapter {
-    private final Game game; // Adicionado para fazer a ponte de telas
+    private final Game game; 
 
     private SpriteBatch batch;
     private ShapeRenderer shapeRenderer; 
@@ -71,7 +72,8 @@ public class Jogo extends ApplicationAdapter {
             assets.texRegFogo, 
             assets.texRegNeve, 
             assets.texRegGrama, 
-            assets.texRegMoeda
+            assets.texRegMoeda,
+            assets.texRegMissil
         );
 
         geradorFundo = new GeradorFundo(
@@ -91,18 +93,14 @@ public class Jogo extends ApplicationAdapter {
 
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
 
+
         personagem.atualizar(delta, VELOCIDADE_MAPA);
         posicaoMapaX += VELOCIDADE_MAPA * delta;
 
-        geradorCenario.atualizar(posicaoMapaX);
+        geradorCenario.atualizar(posicaoMapaX, delta); 
         verificarColetaMoedas();
+        verificarColisaoObstaculos(); 
         verificarInputGranada();
-
-        batch.begin();
-
-        TipoBioma biomaAtivo = geradorCenario.getBiomaSobOJogador(posicaoMapaX);
-        geradorFundo.renderizar(batch, biomaAtivo);
-        geradorCenario.renderizar(batch, posicaoMapaX);
 
         tempoDesdeUltimoInimigo += delta;
         if (tempoDesdeUltimoInimigo >= TEMPO_SPAWN) {
@@ -119,6 +117,12 @@ public class Jogo extends ApplicationAdapter {
                 listaInimigos.remove(i); 
             }
         }
+
+        batch.begin();
+
+        TipoBioma biomaAtivo = geradorCenario.getBiomaSobOJogador(posicaoMapaX);
+        geradorFundo.renderizar(batch, biomaAtivo);
+        geradorCenario.renderizar(batch, posicaoMapaX);
 
         int distancia = (int) personagem.getDistanciaPercorrida();
         int vida = personagem.getVida();
@@ -143,6 +147,32 @@ public class Jogo extends ApplicationAdapter {
         
         shapeRenderer.end();
         fimJogo();
+    }
+
+    private void verificarColisaoObstaculos() {
+        Rectangle colisaoJogador = personagem.getColisao();
+        
+        for (int i = geradorCenario.getObjetosAtivos().size - 1; i >= 0; i--) {
+            ObjetoDeJogo obj = geradorCenario.getObjetosAtivos().get(i);
+            
+            if (obj instanceof mapa.obstaculos.Missil) {
+                float xTela = obj.getPosicao().x - posicaoMapaX + 100f;
+                float yTela = obj.getPosicao().y;
+                
+                Rectangle areaMissil = new Rectangle(xTela, yTela, 32f, 32f);
+                
+                if (colisaoJogador.overlaps(areaMissil)) {
+                    if (personagem.temEscudo()) {
+                        personagem.desativarEscudo(); 
+                    } else {
+                        personagem.tomarDano(personagem.getVida()); 
+                    }
+                    
+                    geradorCenario.getObjetosAtivos().removeIndex(i); 
+                    break; 
+                }
+            }
+        }
     }
 
     private void verificarInputGranada() {

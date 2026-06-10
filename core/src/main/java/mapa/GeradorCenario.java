@@ -5,11 +5,12 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 
+import mapa.obstaculos.Missil;
 import mapa.tiles.ConcretoTile;
 import mapa.tiles.FogoTile;
 import mapa.tiles.GramaTile;
 import mapa.tiles.MoedaTile;
-import mapa.tiles.NeveTile;
+import mapa.tiles.NeveTile; // Import do seu míssil ajustado
 import objetos.ObjetoDeJogo;
 
 public class GeradorCenario {
@@ -27,8 +28,10 @@ public class GeradorCenario {
     private final TextureRegion texNeve;
     private final TextureRegion texGrama;
     private final TextureRegion texMoeda;
+    private final TextureRegion texMissil; 
 
-    public GeradorCenario(TextureRegion concreto, TextureRegion fogo, TextureRegion neve, TextureRegion grama, TextureRegion moeda) {
+
+    public GeradorCenario(TextureRegion concreto, TextureRegion fogo, TextureRegion neve, TextureRegion grama, TextureRegion moeda, TextureRegion missil) {
         this.objetosAtivos = new Array<>();
         this.biomaAtual = TipoBioma.CONCRETO;
         
@@ -37,6 +40,7 @@ public class GeradorCenario {
         this.texNeve = neve;
         this.texGrama = grama;
         this.texMoeda = moeda;
+        this.texMissil = missil;
         
         for (int i = 0; i < 30; i++) {
             gerarProximoBloco();
@@ -64,8 +68,11 @@ public class GeradorCenario {
         objetosAtivos.add(novoChao);
         blocosGeradosNoBiomaAtual++; 
 
+        boolean gerouMoeda = false;
+
         if (proximoX >= proximoXMoeda) {
             if (MathUtils.randomBoolean(0.12f)) {
+                gerouMoeda = true;
                 float alturaBaseMoeda = 300f; 
                 if (nomeBioma.equals("FOGO")) alturaBaseMoeda = 320f;
                 if (nomeBioma.equals("FLORESTA") || nomeBioma.equals("GRAMA")) alturaBaseMoeda = 300f;
@@ -95,8 +102,16 @@ public class GeradorCenario {
             }
         }
 
+        if (!gerouMoeda && MathUtils.randomBoolean(0.13f) && proximoX > (20 * TAMANHO_TILE)) {
+            float alturaMissil = MathUtils.random(100f, 250f);
+            
+            Missil novoMissil = new Missil(texMissil, proximoX, alturaMissil);
+            objetosAtivos.add(novoMissil);
+        }
+
         proximoX += TAMANHO_TILE;
     }
+
 
     private void mudarDeBiomaAleatoriamente() {
         blocosGeradosNoBiomaAtual = 0;
@@ -109,13 +124,21 @@ public class GeradorCenario {
         biomaAtual = novoBioma;
     }
 
-    public void atualizar(float jogadorX) {
+    public void atualizar(float jogadorX, float delta) {
         while (jogadorX > proximoX - 1500) { 
             gerarProximoBloco();
         }
 
         for (int i = objetosAtivos.size - 1; i >= 0; i--) {
             ObjetoDeJogo obj = objetosAtivos.get(i);
+            
+            if (obj instanceof Missil) {
+                Missil m = (Missil) obj;
+                m.getPosicao().x -= m.getVelocidade() * delta; 
+                
+                m.atualizarSeno(delta); 
+            }
+
             if (obj.getPosicao().x < jogadorX - 300) {
                 objetosAtivos.removeIndex(i);
             }
@@ -124,9 +147,16 @@ public class GeradorCenario {
 
     public void renderizar(SpriteBatch batch, float jogadorX) {
         for (ObjetoDeJogo obj : objetosAtivos) {
-            float tamanho = (obj instanceof MoedaTile) ? 32f : TAMANHO_TILE;
+            float largura = TAMANHO_TILE;
+            float altura = TAMANHO_TILE;
+
+            if (obj instanceof MoedaTile) {
+                largura = 32f;
+                altura = 32f;
+            }
+
             float posXNaTela = obj.getPosicao().x - jogadorX + 100f;
-            batch.draw(obj.getTextura(), posXNaTela, obj.getPosicao().y, tamanho, tamanho);
+            batch.draw(obj.getTextura(), posXNaTela, obj.getPosicao().y, largura, altura);
         }
     }
 
@@ -136,7 +166,7 @@ public class GeradorCenario {
 
     public TipoBioma getBiomaSobOJogador(float jogadorX) {
         for (ObjetoDeJogo obj : objetosAtivos) {
-            if (!(obj instanceof MoedaTile)) {
+            if (!(obj instanceof MoedaTile) && !(obj instanceof Missil)) {
                 float limiteEsquerdo = obj.getPosicao().x;
                 float limiteDireito = limiteEsquerdo + TAMANHO_TILE;
 
