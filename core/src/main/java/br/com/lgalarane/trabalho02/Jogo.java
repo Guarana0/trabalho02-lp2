@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.ScreenUtils;
 
@@ -39,10 +40,14 @@ public class Jogo extends ApplicationAdapter {
     private float posicaoMapaX = 0f;
     private final float VELOCIDADE_MAPA = 150f; 
 
+    float larguraMundo = Gdx.graphics.getWidth(); // Ou o tamanho real do seu mapa/tela
+    float alturaMundo = Gdx.graphics.getHeight();
+
+    private float tempoDesdeUltimoInimigo = 0f;
+    private final float TEMPO_SPAWN = 3f; // A cada 4 segundos nasce um inimigo
+
     @Override
     public void create() {
-        float larguraMundo = Gdx.graphics.getWidth(); // Ou o tamanho real do seu mapa/tela
-        float alturaMundo = Gdx.graphics.getHeight();
         listaInimigos = new ArrayList<Inimigo>();
 
         assets = new GameAssets();
@@ -70,13 +75,11 @@ public class Jogo extends ApplicationAdapter {
 
         personagem = new PersonagemPrincipal(0f, 100f, 40f, 40f, assets.somDano);
         areaMoeda = new Rectangle();
-
-        listaInimigos.add(new Esqueleto(larguraMundo, alturaMundo, posicaoMapaX, VELOCIDADE_MAPA, assets.somDano));
-        listaInimigos.add(new Corvo(larguraMundo, alturaMundo, posicaoMapaX, VELOCIDADE_MAPA, assets.somDano));
     }
 
     @Override
     public void render() {
+
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
 
         float delta = Gdx.graphics.getDeltaTime();
@@ -96,10 +99,22 @@ public class Jogo extends ApplicationAdapter {
 
         geradorCenario.renderizar(batch, posicaoMapaX);
 
-         for (Inimigo inimigo : listaInimigos) {
+        tempoDesdeUltimoInimigo += delta;
+        if (tempoDesdeUltimoInimigo >= TEMPO_SPAWN) {
+            spawnInimigo();
+            tempoDesdeUltimoInimigo = 0f; // Reseta o cronômetro
+        }
+
+        for (int i = listaInimigos.size() - 1; i >= 0; i--) {
+            Inimigo inimigo = listaInimigos.get(i);
             inimigo.update(delta);
             inimigo.darDano(personagem);
-        }
+
+            // Se o inimigo saiu da tela (marcado no método deletar do Inimigo)
+            if (!inimigo.getAtivo()) {
+                listaInimigos.remove(i); 
+            }
+    }
 
         int distancia = (int) personagem.getDistanciaPercorrida();
         int vida = personagem.getVida();
@@ -117,9 +132,11 @@ public class Jogo extends ApplicationAdapter {
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         personagem.renderizar(shapeRenderer);
+
         for (Inimigo inimigo : listaInimigos) {
             inimigo.renderizar(shapeRenderer); // Chama a função render de cada inimigo
         }
+        
         shapeRenderer.end();
     }
 
@@ -149,6 +166,23 @@ public class Jogo extends ApplicationAdapter {
                 geradorCenario.getObjetosAtivos().removeIndex(i);
             }
         }
+    }
+
+    public void spawnInimigo() {
+        float xInicial = larguraMundo + 50f;
+        float yAleatorio = MathUtils.random(50f, alturaMundo - 100f);
+
+        int tipoInimigo = MathUtils.random(0, 1);
+
+        if (tipoInimigo == 0) {
+            listaInimigos.add(new Esqueleto(xInicial, yAleatorio, 40f, 40f, assets.somDano));
+        } else {
+            listaInimigos.add(new Corvo(xInicial, yAleatorio, 40f, 40f, assets.somDano));
+        }
+    }
+
+    public void fimJogo() {
+        
     }
 
     @Override

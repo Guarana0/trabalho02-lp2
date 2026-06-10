@@ -1,23 +1,15 @@
 package personagem;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.MathUtils;
 
 public abstract class Inimigo extends Personagem {
     protected float velocidadeX = -20f;
     protected boolean indoEsquerda = true;
 
-    public Inimigo(float larguraMapa, float alturaMapa, float largura, float altura, Sound somDano) {
-        super(
-            MathUtils.random(0f, Math.max(0f, Math.min(Gdx.graphics.getWidth(), larguraMapa) - largura)),
-            MathUtils.random(0f, Math.max(0f, Math.min(Gdx.graphics.getHeight(), alturaMapa) - altura)),
-            largura,
-            altura,
-            somDano
-        );
+    public Inimigo(float x, float y, float largura, float altura, Sound somDano) {
+        super(x, y, largura, altura, somDano);
         this.dano = 1;
         this.vida = 1;
         this.velocidade.x = velocidadeX;
@@ -37,17 +29,8 @@ public abstract class Inimigo extends Personagem {
     }
 
     public void update(float deltaTime) {
-        posicao.x += velocidade.x * deltaTime;
-        areaColisao.setPosition(posicao.x, posicao.y);
+        posicao.x += (velocidade.x - 150f) * deltaTime; 
         
-        // Verifica a cada quadro se o inimigo saiu totalmente da tela
-        deletar();
-    }
-
-    private void deletar() {
-        if (this.posicao.x + this.dimensoes.x < 0) {
-            this.estaVivo = false; // Desativa o inimigo
-            this.destruir();
-        }
+        areaColisao.setPosition(posicao.x, posicao.y);
     }
 }

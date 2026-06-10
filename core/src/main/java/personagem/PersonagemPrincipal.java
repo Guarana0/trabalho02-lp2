@@ -101,7 +101,9 @@ public class PersonagemPrincipal extends Personagem {
         this.qtdGranadas = qtdGranadas;
     }
 
-
-
-
+    public void morte() {
+        if(this.getVida() == 0) {
+            
+        }
+    }
 }

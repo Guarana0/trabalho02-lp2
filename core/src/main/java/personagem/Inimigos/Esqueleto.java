@@ -5,8 +5,8 @@ import com.badlogic.gdx.audio.Sound;
 import personagem.Inimigo;
 public class Esqueleto extends Inimigo {
 
-    public Esqueleto(float larguraMapa, float alturaMapa, float altura, float largura, Sound somDano) {
-        super(larguraMapa, alturaMapa, largura, altura, somDano);
+    public Esqueleto(float x, float y, float largura, float altura, Sound somDano) {
+        super(x, y, largura, altura, somDano);
     }
 }
 

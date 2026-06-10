@@ -11,10 +11,6 @@ public abstract class Personagem {
     protected boolean estaVivo;
     protected int dano;
 
-    // tudo relacionado ao clean foi implementado com ia 
-    protected static final Cleaner cleaner = Cleaner.create();
-    private Cleaner.Cleanable cleanable;
-
     protected Vector2 dimensoes;
     protected Vector2 velocidade;
     protected Vector2 posicao;
@@ -23,27 +19,6 @@ public abstract class Personagem {
     protected Sound somDano;
     protected Texture textura;
 
-    // USO DE IA PARA O CLEAN
-    private static class EstadoLimpeza implements Runnable {
-        private final Texture tex;
-        private final Sound som;
-
-        public EstadoLimpeza(Texture tex, Sound som) {
-            this.tex = tex;
-            this.som = som;
-        }
-
-        @Override
-        public void run() {
-            if (tex != null) {
-                tex.dispose();
-            }
-            if (som != null) {
-                som.dispose();
-            }
-        }
-    }
-
     public Personagem(float x, float y, float largura, float altura, Sound somDano) {
         this.dimensoes = new Vector2(largura, altura);
         this.posicao = new Vector2(x, y);
@@ -51,18 +26,6 @@ public abstract class Personagem {
         this.areaColisao = new Rectangle(x, y, largura, altura);
         this.estaVivo = true;
         this.somDano = somDano;
-    }
-
-    // USO DE IA 
-    protected void inicializarLimpeza() {
-        this.cleanable = cleaner.register(this, new EstadoLimpeza(this.textura, this.somDano));
-    }
-
-    // USO DE IA 
-    public void destruir() {
-        if (cleanable != null) {
-            cleanable.clean();
-        }
     }
 
     public Texture gettextura() {
