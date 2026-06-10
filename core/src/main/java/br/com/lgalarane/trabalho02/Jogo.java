@@ -1,8 +1,8 @@
 package br.com.lgalarane.trabalho02;
 
 import java.util.ArrayList;
-
 import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Game; // Importado
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
@@ -24,6 +24,8 @@ import personagem.Inimigos.Corvo;
 import personagem.Inimigos.Esqueleto;
 
 public class Jogo extends ApplicationAdapter {
+    private final Game game; // Adicionado para fazer a ponte de telas
+
     private SpriteBatch batch;
     private ShapeRenderer shapeRenderer; 
     private BitmapFont font;
@@ -34,20 +36,26 @@ public class Jogo extends ApplicationAdapter {
     private PersonagemPrincipal personagem; 
 
     private ArrayList<Inimigo> listaInimigos;
-
     private Rectangle areaMoeda;
 
     private float posicaoMapaX = 0f;
     private final float VELOCIDADE_MAPA = 150f; 
 
-    float larguraMundo = Gdx.graphics.getWidth(); // Ou o tamanho real do seu mapa/tela
-    float alturaMundo = Gdx.graphics.getHeight();
+    float larguraMundo; 
+    float alturaMundo;
 
     private float tempoDesdeUltimoInimigo = 0f;
-    private final float TEMPO_SPAWN = 3f; // A cada 4 segundos nasce um inimigo
+    private final float TEMPO_SPAWN = 3f; 
+
+    public Jogo(Game game) {
+        this.game = game;
+    }
 
     @Override
     public void create() {
+        larguraMundo = Gdx.graphics.getWidth();
+        alturaMundo = Gdx.graphics.getHeight();
+        
         listaInimigos = new ArrayList<Inimigo>();
 
         assets = new GameAssets();
@@ -79,13 +87,11 @@ public class Jogo extends ApplicationAdapter {
 
     @Override
     public void render() {
+        float delta = Gdx.graphics.getDeltaTime();
 
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
 
-        float delta = Gdx.graphics.getDeltaTime();
-
         personagem.atualizar(delta, VELOCIDADE_MAPA);
-
         posicaoMapaX += VELOCIDADE_MAPA * delta;
 
         geradorCenario.atualizar(posicaoMapaX);
@@ -96,13 +102,12 @@ public class Jogo extends ApplicationAdapter {
 
         TipoBioma biomaAtivo = geradorCenario.getBiomaSobOJogador(posicaoMapaX);
         geradorFundo.renderizar(batch, biomaAtivo);
-
         geradorCenario.renderizar(batch, posicaoMapaX);
 
         tempoDesdeUltimoInimigo += delta;
         if (tempoDesdeUltimoInimigo >= TEMPO_SPAWN) {
             spawnInimigo();
-            tempoDesdeUltimoInimigo = 0f; // Reseta o cronômetro
+            tempoDesdeUltimoInimigo = 0f; 
         }
 
         for (int i = listaInimigos.size() - 1; i >= 0; i--) {
@@ -110,11 +115,10 @@ public class Jogo extends ApplicationAdapter {
             inimigo.update(delta);
             inimigo.darDano(personagem);
 
-            // Se o inimigo saiu da tela (marcado no método deletar do Inimigo)
             if (!inimigo.getAtivo()) {
                 listaInimigos.remove(i); 
             }
-    }
+        }
 
         int distancia = (int) personagem.getDistanciaPercorrida();
         int vida = personagem.getVida();
@@ -134,10 +138,11 @@ public class Jogo extends ApplicationAdapter {
         personagem.renderizar(shapeRenderer);
 
         for (Inimigo inimigo : listaInimigos) {
-            inimigo.renderizar(shapeRenderer); // Chama a função render de cada inimigo
+            inimigo.renderizar(shapeRenderer); 
         }
         
         shapeRenderer.end();
+        fimJogo();
     }
 
     private void verificarInputGranada() {
@@ -182,7 +187,10 @@ public class Jogo extends ApplicationAdapter {
     }
 
     public void fimJogo() {
-        
+        if (personagem.morte()) {
+            this.dispose();
+            game.setScreen(new MorteScreen(game));
+        }
     }
 
     @Override

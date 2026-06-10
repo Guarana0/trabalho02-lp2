@@ -12,7 +12,7 @@ public class JogoScreen implements Screen {
         // isso aq mantem a classe Jogo original e delega chamada às suas
         // funções assim agente nao mexe na lógica do jogo em si
         this.game = game;
-        this.jogo = new Jogo();
+        this.jogo = new Jogo(game);
     }
 
     @Override
