@@ -108,4 +108,12 @@ public class PersonagemPrincipal extends Personagem {
             return false;
         }
     }
+
+    public boolean temEscudo() {
+        return this.protegidoPorEscudo;
+    }
+
+    public void desativarEscudo() {
+        this.protegidoPorEscudo = false;
+    }
 }
