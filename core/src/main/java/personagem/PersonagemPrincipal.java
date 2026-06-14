@@ -14,10 +14,10 @@ public class PersonagemPrincipal extends Personagem {
     private int moeda = 0;
     private int qtdGranadas = 5;
 
-    private final float GRAVIDADE = -1700f;
-    private final float FORCA_JETPACK = 2400f;
-    private final float VELOCIDADE_MAXIMA_SUBIDA = 380f;
-    private final float VELOCIDADE_MAXIMA_DESCIDA = -900f;
+    private final float GRAVIDADE = -2200f;
+    private final float FORCA_JETPACK = 1800f;
+    private final float VELOCIDADE_MAXIMA_SUBIDA = 320f;
+    private final float VELOCIDADE_MAXIMA_DESCIDA = -700f;
     private float velocidadeY = 0f;
 
     private final float ALTURA_CHAO = 50f;
@@ -45,15 +45,15 @@ public class PersonagemPrincipal extends Personagem {
     public void atualizar(float deltaTempo, float velocidadeMapa) {
         apertouEsp = Gdx.input.isKeyPressed(Input.Keys.SPACE) || Gdx.input.isTouched();
 
-        float aceleracaoY = GRAVIDADE;
         if (apertouEsp) {
             if (velocidadeY < 0) {
-                velocidadeY *= 0.55f; // amortecer a queda antes de subir
+                velocidadeY *= 0.5f; // reduz a queda antes de subir
             }
-            aceleracaoY += FORCA_JETPACK;
+            velocidadeY += FORCA_JETPACK * deltaTempo;
+        } else {
+            velocidadeY += GRAVIDADE * deltaTempo;
         }
 
-        velocidadeY += aceleracaoY * deltaTempo;
         velocidadeY = MathUtils.clamp(velocidadeY, VELOCIDADE_MAXIMA_DESCIDA, VELOCIDADE_MAXIMA_SUBIDA);
 
         float novoY = posicao.y + (velocidadeY * deltaTempo);
