@@ -81,7 +81,7 @@ public class Jogo extends ApplicationAdapter {
             assets.texRegFundoConcreto
         );
 
-        personagem = new PersonagemPrincipal(0f, 100f, 40f, 40f, assets.somDano);
+        personagem = new PersonagemPrincipal(0f, 100f, 40f, 40f, assets.somDano, assets.animacaoPersonagem);
         areaMoeda = new Rectangle();
     }
 
@@ -135,7 +135,6 @@ public class Jogo extends ApplicationAdapter {
         batch.end();
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        personagem.renderizar(shapeRenderer);
 
         for (Inimigo inimigo : listaInimigos) {
             inimigo.renderizar(shapeRenderer); 

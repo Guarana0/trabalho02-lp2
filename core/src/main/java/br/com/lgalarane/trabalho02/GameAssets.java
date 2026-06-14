@@ -3,6 +3,7 @@ package br.com.lgalarane.trabalho02;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class GameAssets {
@@ -23,6 +24,9 @@ public class GameAssets {
     public TextureRegion texRegFundoNeve;
     public TextureRegion texRegFundoConcreto;
 
+    public TextureRegion personagem;
+    public Animation<TextureRegion> animacaoPersonagem;
+
     public GameAssets() {
         this.managerAsset = new AssetManager();
     }
@@ -41,6 +45,7 @@ public class GameAssets {
         managerAsset.load("textures/fogofundo.png", Texture.class);
         managerAsset.load("textures/nevefundo.png", Texture.class);
         managerAsset.load("textures/concretofundo.png", Texture.class);
+        managerAsset.load("textures/personagem.png", Texture.class);
 
         managerAsset.finishLoading();
 
@@ -61,6 +66,12 @@ public class GameAssets {
         texRegFundoFogo = new TextureRegion(managerAsset.get("textures/fogofundo.png", Texture.class));
         texRegFundoNeve = new TextureRegion(managerAsset.get("textures/nevefundo.png", Texture.class));
         texRegFundoConcreto = new TextureRegion(managerAsset.get("textures/concretofundo.png", Texture.class));
+        
+        Texture texturaPersonagem = managerAsset.get("textures/personagem.png", Texture.class);
+        personagem = new TextureRegion(texturaPersonagem);
+
+        // Inicializa a animação com 0.1f segundos de intervalo por frame
+        animacaoPersonagem = new Animation<>(0.1f, framesAnimacao);
     }
 
     public void limparAssets() {

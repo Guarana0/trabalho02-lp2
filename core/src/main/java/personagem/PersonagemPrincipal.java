@@ -4,6 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public class PersonagemPrincipal extends Personagem {
@@ -22,10 +25,23 @@ public class PersonagemPrincipal extends Personagem {
     private final float POSICAO_FIXA_TELA_X = 100f;
     private float distanciaPercorrida = 0f;
 
-    public PersonagemPrincipal(float x, float y, float largura, float altura, Sound somDano) {
+    private Animation<TextureRegion> animacaoAtual;
+    private float stateTime;
+
+    public PersonagemPrincipal(float x, float y, float largura, float altura, Sound somDano, Animation<TextureRegion> animacao) {
         super(x, y, largura, altura, somDano);
         this.protegidoPorEscudo = false;
         this.vida = 3;
+        this.animacaoAtual = animacao;
+        this.stateTime = 0;
+
+        if (animacao != null) {
+            TextureRegion primeiroFrame = animacao.getKeyFrame(0);
+            this.dimensoes.set(primeiroFrame.getRegionWidth(), primeiroFrame.getRegionHeight());
+            
+            // Atualiza também o tamanho da área de colisão para bater com o tamanho do sprite
+            this.areaColisao.setSize(this.dimensoes.x, this.dimensoes.y);
+        }
     }
 
     public boolean getProtegidoPorEscudo() { return protegidoPorEscudo; }
@@ -33,6 +49,8 @@ public class PersonagemPrincipal extends Personagem {
     public float getDistanciaPercorrida() { return distanciaPercorrida; }
 
     public void atualizar(float deltaTempo, float velocidadeMapa) {
+        this.stateTime += deltaTempo;
+
         apertouEsp = Gdx.input.isKeyPressed(Input.Keys.SPACE) || Gdx.input.isTouched();
         
         if (apertouEsp) {
@@ -61,14 +79,11 @@ public class PersonagemPrincipal extends Personagem {
         areaColisao.setPosition(POSICAO_FIXA_TELA_X, novoY);
     }
 
-    public void renderizar(ShapeRenderer shape) {
-        if (protegidoPorEscudo) {
-            shape.setColor(Color.CYAN);
-        } else {
-            shape.setColor(Color.BLUE);
-        }
+    public void renderizar(SpriteBatch batch) {
+        // aqui renderiza as animações e o loop fica em true para a animação sempre progredir
+        TextureRegion frameAtual = animacaoAtual.getKeyFrame(stateTime, true);
 
-        shape.rect(posicao.x, posicao.y, dimensoes.x, dimensoes.y);
+        batch.draw(frameAtual, posicao.x, posicao.y, dimensoes.x, dimensoes.y);
     }
 
     @Override
