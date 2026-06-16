@@ -165,7 +165,7 @@ public class Jogo extends ApplicationAdapter {
                     if (personagem.temEscudo()) {
                         personagem.desativarEscudo(); 
                     } else {
-                        personagem.tomarDano(personagem.getVida()); 
+                        personagem.tomarDano(1); 
                     }
                     
                     geradorCenario.getObjetosAtivos().removeIndex(i); 

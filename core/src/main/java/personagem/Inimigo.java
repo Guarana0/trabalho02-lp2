@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 public abstract class Inimigo extends Personagem {
     protected float velocidadeX = -20f;
     protected boolean indoEsquerda = true;
+    protected boolean jaCausouDano = false;
 
     public Inimigo(float x, float y, float largura, float altura, Sound somDano) {
         super(x, y, largura, altura, somDano);
@@ -18,7 +19,12 @@ public abstract class Inimigo extends Personagem {
     public void darDano(Personagem alvo) {
         if (alvo != null && this.getColisao() != null && alvo.getColisao() != null) {
             if (this.getColisao().overlaps(alvo.getColisao())) {
-                alvo.tomarDano(this.dano);
+                if (!jaCausouDano) {
+                    alvo.tomarDano(this.dano);
+                    jaCausouDano = true;
+                }
+            } else {
+                jaCausouDano = false;
             }
         }
     }
