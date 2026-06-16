@@ -4,6 +4,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.Array;
 
 public class GameAssets {
     private AssetManager managerAsset;
@@ -22,6 +23,8 @@ public class GameAssets {
     public TextureRegion texRegFundoFogo;
     public TextureRegion texRegFundoNeve;
     public TextureRegion texRegFundoConcreto;
+
+    public Array<TextureRegion> framesExplosao;
 
     public GameAssets() {
         this.managerAsset = new AssetManager();
@@ -43,6 +46,12 @@ public class GameAssets {
         managerAsset.load("textures/nevefundo.png", Texture.class);
         managerAsset.load("textures/concretofundo.png", Texture.class);
 
+        for (int i = 0; i < 24; i++) {
+            // String.format("%02d", i) transforma o número 0 em "00", 1 em "01", etc.
+            String caminhoFrame = String.format("textures/explosao_frames/explosao_%02d.png", i);
+            managerAsset.load(caminhoFrame, Texture.class);
+        }
+
         managerAsset.finishLoading();
 
         somDano = managerAsset.get("fontes/dano.wav", Sound.class);
@@ -61,6 +70,17 @@ public class GameAssets {
         texRegFundoFogo = new TextureRegion(managerAsset.get("textures/fogofundo.png", Texture.class));
         texRegFundoNeve = new TextureRegion(managerAsset.get("textures/nevefundo.png", Texture.class));
         texRegFundoConcreto = new TextureRegion(managerAsset.get("textures/concretofundo.png", Texture.class));
+
+        framesExplosao = new Array<>();
+        for (int i = 0; i < 24; i++) {
+            String caminhoFrame = String.format("textures/explosao_frames/explosao_%02d.png", i);
+            Texture tex = managerAsset.get(caminhoFrame, Texture.class);
+            
+
+            tex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+            
+            framesExplosao.add(new TextureRegion(tex));
+        }
     }
 
     public void limparAssets() {
