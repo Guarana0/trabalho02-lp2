@@ -7,7 +7,9 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 
-public class PersonagemPrincipal extends Personagem {
+import mapa.obstaculos.Explodivel;
+
+public class PersonagemPrincipal extends Personagem implements Explodivel{
     private boolean apertouEsp;
     private boolean protegidoPorEscudo;
 
@@ -127,5 +129,10 @@ public class PersonagemPrincipal extends Personagem {
 
     public void desativarEscudo() {
         this.protegidoPorEscudo = false;
+    }
+
+    @Override
+    public boolean deveExplodir(float x, float y) {
+        return this.vida <= 0;
     }
 }

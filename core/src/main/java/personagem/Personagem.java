@@ -4,7 +4,6 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import java.lang.ref.Cleaner;
 
 public abstract class Personagem {
     protected int vida;
@@ -75,4 +74,5 @@ public abstract class Personagem {
         }
         return this.vida;
     }
+    
 }
