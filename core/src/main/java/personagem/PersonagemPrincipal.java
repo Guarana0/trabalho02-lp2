@@ -8,17 +8,21 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
 
-public class PersonagemPrincipal extends Personagem {
+import mapa.obstaculos.Explodivel;
+
+public class PersonagemPrincipal extends Personagem implements Explodivel{
     private boolean apertouEsp;
     private boolean protegidoPorEscudo;
 
     private int moeda = 0;
-    private int qtdGranadas=5;
+    private int qtdGranadas = 5;
 
-    private final float GRAVIDADE = -500f;
-    private final float FORCA_JETPACK = 1000f;
-    private final float VELOCIDADE_MAIXIMA = 500f;
+    private final float GRAVIDADE = -2200f;
+    private final float FORCA_JETPACK = 1800f;
+    private final float VELOCIDADE_MAXIMA_SUBIDA = 320f;
+    private final float VELOCIDADE_MAXIMA_DESCIDA = -700f;
     private float velocidadeY = 0f;
 
     private final float ALTURA_CHAO = 50f;
@@ -44,23 +48,33 @@ public class PersonagemPrincipal extends Personagem {
         }
     }
 
-    public boolean getProtegidoPorEscudo() { return protegidoPorEscudo; }
-    public void setProtegidoPorEscudo(boolean protegidoPorEscudo) { this.protegidoPorEscudo = protegidoPorEscudo; }
-    public float getDistanciaPercorrida() { return distanciaPercorrida; }
+    public boolean getProtegidoPorEscudo() {
+        return protegidoPorEscudo;
+    }
+
+    public void setProtegidoPorEscudo(boolean protegidoPorEscudo) {
+        this.protegidoPorEscudo = protegidoPorEscudo;
+    }
+
+    public float getDistanciaPercorrida() {
+        return distanciaPercorrida;
+    }
 
     public void atualizar(float deltaTempo, float velocidadeMapa) {
         this.stateTime += deltaTempo;
 
         apertouEsp = Gdx.input.isKeyPressed(Input.Keys.SPACE) || Gdx.input.isTouched();
-        
+
         if (apertouEsp) {
-            velocidadeY += (GRAVIDADE + FORCA_JETPACK) * deltaTempo;
+            if (velocidadeY < 0) {
+                velocidadeY *= 0.5f; // reduz a queda antes de subir
+            }
+            velocidadeY += FORCA_JETPACK * deltaTempo;
         } else {
             velocidadeY += GRAVIDADE * deltaTempo;
         }
 
-        if (velocidadeY > VELOCIDADE_MAIXIMA) { velocidadeY = VELOCIDADE_MAIXIMA; }
-        if (velocidadeY < -VELOCIDADE_MAIXIMA) { velocidadeY = -VELOCIDADE_MAIXIMA; }
+        velocidadeY = MathUtils.clamp(velocidadeY, VELOCIDADE_MAXIMA_DESCIDA, VELOCIDADE_MAXIMA_SUBIDA);
 
         float novoY = posicao.y + (velocidadeY * deltaTempo);
         distanciaPercorrida += velocidadeMapa * deltaTempo;
@@ -107,7 +121,7 @@ public class PersonagemPrincipal extends Personagem {
         return vida;
     }
 
-    //granadas
+    // granadas
     public int getQtdGranadas() {
         return qtdGranadas;
     }
@@ -117,10 +131,23 @@ public class PersonagemPrincipal extends Personagem {
     }
 
     public boolean morte() {
-        if(this.getVida() == 0) {
+        if (this.getVida() == 0) {
             return true;
         } else {
             return false;
         }
+    }
+
+    public boolean temEscudo() {
+        return this.protegidoPorEscudo;
+    }
+
+    public void desativarEscudo() {
+        this.protegidoPorEscudo = false;
+    }
+
+    @Override
+    public boolean deveExplodir(float x, float y) {
+        return this.vida <= 0;
     }
 }

@@ -5,6 +5,7 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.Array;
 
 public class GameAssets {
     private AssetManager managerAsset;
@@ -15,17 +16,21 @@ public class GameAssets {
     public TextureRegion texRegFogo;
     public TextureRegion texRegNeve;
     public TextureRegion texRegGrama;
-    public TextureRegion taxRegMoeda; 
     public TextureRegion texRegMoeda;  
     public TextureRegion texRegGranada;
+    public TextureRegion texRegMissil; 
 
     public TextureRegion texRegFundoGrama;
     public TextureRegion texRegFundoFogo;
     public TextureRegion texRegFundoNeve;
     public TextureRegion texRegFundoConcreto;
 
+<<<<<<< HEAD
     public TextureRegion personagem;
     public Animation<TextureRegion> animacaoPersonagem;
+=======
+    public Array<TextureRegion> framesExplosao;
+>>>>>>> main
 
     public GameAssets() {
         this.managerAsset = new AssetManager();
@@ -40,12 +45,19 @@ public class GameAssets {
         managerAsset.load("textures/grama.png", Texture.class);
         managerAsset.load("textures/moeda.png", Texture.class);
         managerAsset.load("textures/granada.png", Texture.class); 
+        managerAsset.load("textures/missil.png", Texture.class); 
 
         managerAsset.load("textures/gramafundo.png", Texture.class);
         managerAsset.load("textures/fogofundo.png", Texture.class);
         managerAsset.load("textures/nevefundo.png", Texture.class);
         managerAsset.load("textures/concretofundo.png", Texture.class);
         managerAsset.load("textures/personagem.png", Texture.class);
+
+        for (int i = 0; i < 24; i++) {
+            // String.format("%02d", i) transforma o número 0 em "00", 1 em "01", etc.
+            String caminhoFrame = String.format("textures/explosao_frames/explosao_%02d.png", i);
+            managerAsset.load(caminhoFrame, Texture.class);
+        }
 
         managerAsset.finishLoading();
 
@@ -56,11 +68,10 @@ public class GameAssets {
         texRegNeve = new TextureRegion(managerAsset.get("textures/neve.png", Texture.class));
         texRegGrama = new TextureRegion(managerAsset.get("textures/grama.png", Texture.class));
         
-        Texture moedaTex = managerAsset.get("textures/moeda.png", Texture.class);
-        texRegMoeda = new TextureRegion(moedaTex);
-        taxRegMoeda = new TextureRegion(moedaTex);
-        
+        texRegMoeda = new TextureRegion(managerAsset.get("textures/moeda.png", Texture.class));
         texRegGranada = new TextureRegion(managerAsset.get("textures/granada.png", Texture.class));
+        
+        texRegMissil = new TextureRegion(managerAsset.get("textures/missil.png", Texture.class));
 
         texRegFundoGrama = new TextureRegion(managerAsset.get("textures/gramafundo.png", Texture.class));
         texRegFundoFogo = new TextureRegion(managerAsset.get("textures/fogofundo.png", Texture.class));
