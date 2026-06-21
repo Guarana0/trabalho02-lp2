@@ -173,13 +173,10 @@ public class Jogo extends ApplicationAdapter {
 
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-<<<<<<< HEAD
-=======
         
         if (personagem.getVida() > 0) {
             personagem.renderizar(batch);
         }
->>>>>>> main
 
         for (Inimigo inimigo : listaInimigos) {
             inimigo.renderizar(shapeRenderer); 
