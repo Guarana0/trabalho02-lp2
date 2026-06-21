@@ -1,10 +1,13 @@
 package personagem;
 
+import br.com.lgalarane.trabalho02.GameAssets;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 
 import mapa.obstaculos.Explodivel;
@@ -22,14 +25,25 @@ public class PersonagemPrincipal extends Personagem implements Explodivel{
     private final float VELOCIDADE_MAXIMA_DESCIDA = -700f;
     private float velocidadeY = 0f;
 
-    private final float ALTURA_CHAO = 50f;
+    private final float ALTURA_CHAO = 8f;
     private final float POSICAO_FIXA_TELA_X = 100f;
     private float distanciaPercorrida = 0f;
 
-    public PersonagemPrincipal(float x, float y, float largura, float altura, Sound somDano) {
+    private Animation<TextureRegion> animCorrendo;
+    private Animation<TextureRegion> animVoando;
+
+    private enum Estado { PARADO, CORRENDO, VOANDO }
+    private Estado estado = Estado.CORRENDO;
+
+    private float stateTime = 0f; 
+
+    public PersonagemPrincipal(float x, float y, float largura, float altura, Sound somDano, GameAssets assets) {
         super(x, y, largura, altura, somDano);
         this.protegidoPorEscudo = false;
         this.vida = 3;
+
+        animCorrendo = new Animation<>(0.1f, assets.framesCorrendo, Animation.PlayMode.LOOP);
+        animVoando   = new Animation<>(0.1f, assets.framesVoando,   Animation.PlayMode.LOOP);
     }
 
     public boolean getProtegidoPorEscudo() {
@@ -45,15 +59,25 @@ public class PersonagemPrincipal extends Personagem implements Explodivel{
     }
 
     public void atualizar(float deltaTempo, float velocidadeMapa) {
-        apertouEsp = Gdx.input.isKeyPressed(Input.Keys.SPACE) || Gdx.input.isTouched();
+    stateTime += deltaTempo;
+
+    apertouEsp = Gdx.input.isKeyPressed(Input.Keys.SPACE) || Gdx.input.isTouched();
+
+    Estado estadoAnterior = estado;
 
         if (apertouEsp) {
             if (velocidadeY < 0) {
                 velocidadeY *= 0.5f; // reduz a queda antes de subir
             }
             velocidadeY += FORCA_JETPACK * deltaTempo;
+            estado = Estado.VOANDO;
         } else {
             velocidadeY += GRAVIDADE * deltaTempo;
+            if (posicao.y <= ALTURA_CHAO) {
+                estado = Estado.CORRENDO;
+            } else {
+                estado = Estado.VOANDO;
+            }
         }
 
         velocidadeY = MathUtils.clamp(velocidadeY, VELOCIDADE_MAXIMA_DESCIDA, VELOCIDADE_MAXIMA_SUBIDA);
@@ -75,14 +99,18 @@ public class PersonagemPrincipal extends Personagem implements Explodivel{
         areaColisao.setPosition(POSICAO_FIXA_TELA_X, novoY);
     }
 
-    public void renderizar(ShapeRenderer shape) {
-        if (protegidoPorEscudo) {
-            shape.setColor(Color.CYAN);
-        } else {
-            shape.setColor(Color.BLUE);
+    public void renderizar(SpriteBatch batch) {
+        TextureRegion frame;
+
+        switch (estado) {
+            case VOANDO:
+                frame = animVoando.getKeyFrame(stateTime);
+                break;
+            default:
+                frame = animCorrendo.getKeyFrame(stateTime);
         }
 
-        shape.rect(posicao.x, posicao.y, dimensoes.x, dimensoes.y);
+        batch.draw(frame, posicao.x, posicao.y, dimensoes.x, dimensoes.y);
     }
 
     @Override

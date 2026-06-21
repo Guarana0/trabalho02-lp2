@@ -26,6 +26,11 @@ public class GameAssets {
 
     public Array<TextureRegion> framesExplosao;
 
+    public Texture texPersonagem;
+    public Array<TextureRegion> frameAnd;
+    public Array<TextureRegion> framesCorrendo;
+    public Array<TextureRegion> framesVoando;
+
     public GameAssets() {
         this.managerAsset = new AssetManager();
     }
@@ -45,6 +50,8 @@ public class GameAssets {
         managerAsset.load("textures/fogofundo.png", Texture.class);
         managerAsset.load("textures/nevefundo.png", Texture.class);
         managerAsset.load("textures/concretofundo.png", Texture.class);
+
+        managerAsset.load("textures/personagem.png", Texture.class);
 
         for (int i = 0; i < 24; i++) {
             // String.format("%02d", i) transforma o número 0 em "00", 1 em "01", etc.
@@ -70,6 +77,23 @@ public class GameAssets {
         texRegFundoFogo = new TextureRegion(managerAsset.get("textures/fogofundo.png", Texture.class));
         texRegFundoNeve = new TextureRegion(managerAsset.get("textures/nevefundo.png", Texture.class));
         texRegFundoConcreto = new TextureRegion(managerAsset.get("textures/concretofundo.png", Texture.class));
+
+        // IA para a criação de design do sprite
+        texPersonagem = managerAsset.get("textures/personagem.png", Texture.class);
+        
+        // tudo abaixo até a linha 100 foi utilizado IA
+        int frameW = 426;
+        int frameH = 1440;
+        
+        framesCorrendo = new Array<>();
+        framesCorrendo.add(new TextureRegion(texPersonagem, 0 * frameW, 0, frameW, frameH));
+        framesCorrendo.add(new TextureRegion(texPersonagem, 1 * frameW, 0, frameW, frameH));
+        framesCorrendo.add(new TextureRegion(texPersonagem, 2 * frameW, 0, frameW, frameH));
+        framesCorrendo.add(new TextureRegion(texPersonagem, 3 * frameW, 0, frameW, frameH));
+
+        framesVoando = new Array<>();
+        framesVoando.add(new TextureRegion(texPersonagem, 4 * frameW, 0, frameW, frameH));
+        framesVoando.add(new TextureRegion(texPersonagem, 5 * frameW, 0, frameW, frameH));
 
         framesExplosao = new Array<>();
         for (int i = 0; i < 24; i++) {
