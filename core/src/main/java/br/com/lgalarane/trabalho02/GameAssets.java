@@ -78,24 +78,20 @@ public class GameAssets {
         texRegFundoNeve = new TextureRegion(managerAsset.get("textures/nevefundo.png", Texture.class));
         texRegFundoConcreto = new TextureRegion(managerAsset.get("textures/concretofundo.png", Texture.class));
 
+        // IA para a criação de design do sprite
         texPersonagem = managerAsset.get("textures/personagem.png", Texture.class);
         
         // tudo abaixo até a linha 100 foi utilizado IA
-        int frameW = 256;
-        int frameH = 1024;
-
-        // Frame 0: parado
-        frameAnd = new Array<>();
-        frameAnd.add(new TextureRegion(texPersonagem, 0 * frameW, 0, frameW, frameH));
-
-        // Frames 1-2: correndo
+        int frameW = 426;
+        int frameH = 1440;
+        
         framesCorrendo = new Array<>();
+        framesCorrendo.add(new TextureRegion(texPersonagem, 0 * frameW, 0, frameW, frameH));
         framesCorrendo.add(new TextureRegion(texPersonagem, 1 * frameW, 0, frameW, frameH));
         framesCorrendo.add(new TextureRegion(texPersonagem, 2 * frameW, 0, frameW, frameH));
+        framesCorrendo.add(new TextureRegion(texPersonagem, 3 * frameW, 0, frameW, frameH));
 
-        // Frames 3-5: voando com jetpack
         framesVoando = new Array<>();
-        framesVoando.add(new TextureRegion(texPersonagem, 3 * frameW, 0, frameW, frameH));
         framesVoando.add(new TextureRegion(texPersonagem, 4 * frameW, 0, frameW, frameH));
         framesVoando.add(new TextureRegion(texPersonagem, 5 * frameW, 0, frameW, frameH));
 

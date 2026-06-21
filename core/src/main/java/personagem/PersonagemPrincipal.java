@@ -5,11 +5,9 @@ import br.com.lgalarane.trabalho02.GameAssets;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 
 import mapa.obstaculos.Explodivel;
@@ -27,11 +25,10 @@ public class PersonagemPrincipal extends Personagem implements Explodivel{
     private final float VELOCIDADE_MAXIMA_DESCIDA = -700f;
     private float velocidadeY = 0f;
 
-    private final float ALTURA_CHAO = 50f;
+    private final float ALTURA_CHAO = 8f;
     private final float POSICAO_FIXA_TELA_X = 100f;
     private float distanciaPercorrida = 0f;
 
-    private Animation<TextureRegion> animAnd;
     private Animation<TextureRegion> animCorrendo;
     private Animation<TextureRegion> animVoando;
 
@@ -45,7 +42,6 @@ public class PersonagemPrincipal extends Personagem implements Explodivel{
         this.protegidoPorEscudo = false;
         this.vida = 3;
 
-        animAnd     = new Animation<>(0.2f, assets.frameAnd,     Animation.PlayMode.LOOP);
         animCorrendo = new Animation<>(0.1f, assets.framesCorrendo, Animation.PlayMode.LOOP);
         animVoando   = new Animation<>(0.1f, assets.framesVoando,   Animation.PlayMode.LOOP);
     }
@@ -84,12 +80,6 @@ public class PersonagemPrincipal extends Personagem implements Explodivel{
             }
         }
 
-        if (estado != estadoAnterior) {
-            stateTime = 0f;
-        }
-
-
-
         velocidadeY = MathUtils.clamp(velocidadeY, VELOCIDADE_MAXIMA_DESCIDA, VELOCIDADE_MAXIMA_SUBIDA);
 
         float novoY = posicao.y + (velocidadeY * deltaTempo);
@@ -116,11 +106,8 @@ public class PersonagemPrincipal extends Personagem implements Explodivel{
             case VOANDO:
                 frame = animVoando.getKeyFrame(stateTime);
                 break;
-            case CORRENDO:
-                frame = animCorrendo.getKeyFrame(stateTime);
-                break;
             default:
-                frame = animAnd.getKeyFrame(stateTime);
+                frame = animCorrendo.getKeyFrame(stateTime);
         }
 
         batch.draw(frame, posicao.x, posicao.y, dimensoes.x, dimensoes.y);
