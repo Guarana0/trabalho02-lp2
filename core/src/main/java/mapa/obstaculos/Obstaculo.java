@@ -5,11 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import objetos.ObjetoDeJogo;
 
 public abstract class Obstaculo extends ObjetoDeJogo {
-<<<<<<< HEAD
-    protected final int dano = 1;
-=======
     protected final int dano = 3;
->>>>>>> main
     protected float velocidade;
 
     public Obstaculo(TextureRegion textura, float x, float y, float velocidade) {

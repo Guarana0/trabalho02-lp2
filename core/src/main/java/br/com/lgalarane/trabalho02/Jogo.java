@@ -103,7 +103,7 @@ public class Jogo extends ApplicationAdapter {
             assets.texRegFundoConcreto
         );
 
-        personagem = new PersonagemPrincipal(0f, 100f, 40f, 40f, assets.somDano, assets.animacaoPersonagem);
+        personagem = new PersonagemPrincipal(0f, 100f, 130f, 170f, assets.somDano, assets);
         areaMoeda = new Rectangle();
     }
 
@@ -171,21 +171,18 @@ public class Jogo extends ApplicationAdapter {
         batch.draw(assets.texRegGranada, 10, Gdx.graphics.getHeight() - 95, 24, 24);
         font.draw(batch, "x" + granadas, 40, Gdx.graphics.getHeight() - 78);
 
-        batch.end();
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-<<<<<<< HEAD
-=======
         
         if (personagem.getVida() > 0) {
-            personagem.renderizar(shapeRenderer);
+            personagem.renderizar(batch);
         }
->>>>>>> main
 
         for (Inimigo inimigo : listaInimigos) {
             inimigo.renderizar(shapeRenderer); 
         }
         
+        batch.end();
         shapeRenderer.end();
         fimJogo();
     }

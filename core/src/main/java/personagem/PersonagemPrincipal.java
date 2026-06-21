@@ -1,13 +1,13 @@
 package personagem;
 
+import br.com.lgalarane.trabalho02.GameAssets;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 
 import mapa.obstaculos.Explodivel;
@@ -25,27 +25,25 @@ public class PersonagemPrincipal extends Personagem implements Explodivel{
     private final float VELOCIDADE_MAXIMA_DESCIDA = -700f;
     private float velocidadeY = 0f;
 
-    private final float ALTURA_CHAO = 50f;
+    private final float ALTURA_CHAO = 8f;
     private final float POSICAO_FIXA_TELA_X = 100f;
     private float distanciaPercorrida = 0f;
 
-    private Animation<TextureRegion> animacaoAtual;
-    private float stateTime;
+    private Animation<TextureRegion> animCorrendo;
+    private Animation<TextureRegion> animVoando;
 
-    public PersonagemPrincipal(float x, float y, float largura, float altura, Sound somDano, Animation<TextureRegion> animacao) {
+    private enum Estado { PARADO, CORRENDO, VOANDO }
+    private Estado estado = Estado.CORRENDO;
+
+    private float stateTime = 0f; 
+
+    public PersonagemPrincipal(float x, float y, float largura, float altura, Sound somDano, GameAssets assets) {
         super(x, y, largura, altura, somDano);
         this.protegidoPorEscudo = false;
         this.vida = 3;
-        this.animacaoAtual = animacao;
-        this.stateTime = 0;
 
-        if (animacao != null) {
-            TextureRegion primeiroFrame = animacao.getKeyFrame(0);
-            this.dimensoes.set(primeiroFrame.getRegionWidth(), primeiroFrame.getRegionHeight());
-            
-            // Atualiza também o tamanho da área de colisão para bater com o tamanho do sprite
-            this.areaColisao.setSize(this.dimensoes.x, this.dimensoes.y);
-        }
+        animCorrendo = new Animation<>(0.1f, assets.framesCorrendo, Animation.PlayMode.LOOP);
+        animVoando   = new Animation<>(0.1f, assets.framesVoando,   Animation.PlayMode.LOOP);
     }
 
     public boolean getProtegidoPorEscudo() {
@@ -61,17 +59,25 @@ public class PersonagemPrincipal extends Personagem implements Explodivel{
     }
 
     public void atualizar(float deltaTempo, float velocidadeMapa) {
-        this.stateTime += deltaTempo;
+    stateTime += deltaTempo;
 
-        apertouEsp = Gdx.input.isKeyPressed(Input.Keys.SPACE) || Gdx.input.isTouched();
+    apertouEsp = Gdx.input.isKeyPressed(Input.Keys.SPACE) || Gdx.input.isTouched();
+
+    Estado estadoAnterior = estado;
 
         if (apertouEsp) {
             if (velocidadeY < 0) {
                 velocidadeY *= 0.5f; // reduz a queda antes de subir
             }
             velocidadeY += FORCA_JETPACK * deltaTempo;
+            estado = Estado.VOANDO;
         } else {
             velocidadeY += GRAVIDADE * deltaTempo;
+            if (posicao.y <= ALTURA_CHAO) {
+                estado = Estado.CORRENDO;
+            } else {
+                estado = Estado.VOANDO;
+            }
         }
 
         velocidadeY = MathUtils.clamp(velocidadeY, VELOCIDADE_MAXIMA_DESCIDA, VELOCIDADE_MAXIMA_SUBIDA);
@@ -94,10 +100,17 @@ public class PersonagemPrincipal extends Personagem implements Explodivel{
     }
 
     public void renderizar(SpriteBatch batch) {
-        // aqui renderiza as animações e o loop fica em true para a animação sempre progredir
-        TextureRegion frameAtual = animacaoAtual.getKeyFrame(stateTime, true);
+        TextureRegion frame;
 
-        batch.draw(frameAtual, posicao.x, posicao.y, dimensoes.x, dimensoes.y);
+        switch (estado) {
+            case VOANDO:
+                frame = animVoando.getKeyFrame(stateTime);
+                break;
+            default:
+                frame = animCorrendo.getKeyFrame(stateTime);
+        }
+
+        batch.draw(frame, posicao.x, posicao.y, dimensoes.x, dimensoes.y);
     }
 
     @Override
