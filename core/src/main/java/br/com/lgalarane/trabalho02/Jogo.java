@@ -24,8 +24,9 @@ import mapa.planosdefundo.GeradorFundo;
 import mapa.tiles.MoedaTile;
 import objetos.ObjetoDeJogo;
 import personagem.Inimigo;
-import personagem.Inimigos.Corvo;
 import personagem.Inimigos.Esqueleto;
+import personagem.Inimigos.Goblin;
+
 import personagem.PersonagemPrincipal;
 
 public class Jogo extends ApplicationAdapter {
@@ -153,7 +154,7 @@ public class Jogo extends ApplicationAdapter {
         TipoBioma biomaAtivo = geradorCenario.getBiomaSobOJogador(posicaoMapaX);
         geradorFundo.renderizar(batch, biomaAtivo);
         geradorCenario.renderizar(batch, posicaoMapaX);
-
+        
         for (EfeitoExplosao exp : explosoesAtivas) {
             TextureRegion frameAtual = animacaoExplosao.getKeyFrame(exp.tempoDeVida);
             batch.draw(frameAtual, exp.x, exp.y, 32f, 32f);
@@ -172,18 +173,20 @@ public class Jogo extends ApplicationAdapter {
         font.draw(batch, "x" + granadas, 40, Gdx.graphics.getHeight() - 78);
 
 
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        
+        // Render principal com SpriteBatch
         if (personagem.getVida() > 0) {
             personagem.renderizar(batch);
         }
 
-        for (Inimigo inimigo : listaInimigos) {
-            inimigo.renderizar(shapeRenderer); 
-        }
-        
+            for (Inimigo inimigo : listaInimigos) {
+                if (inimigo instanceof Esqueleto esqueleto) {
+                    esqueleto.renderizar(batch);
+                } else if (inimigo instanceof Goblin goblin) {
+                    goblin.renderizar(batch);
+                }
+            }
+
         batch.end();
-        shapeRenderer.end();
         fimJogo();
     }
 
@@ -273,9 +276,9 @@ public class Jogo extends ApplicationAdapter {
         int tipoInimigo = MathUtils.random(0, 1);
 
         if (tipoInimigo == 0) {
-            listaInimigos.add(new Esqueleto(xInicial, yAleatorio, 40f, 40f, assets.somDano));
+            listaInimigos.add(new Esqueleto(xInicial, yAleatorio, 40f, 40f, assets.somDano, assets));
         } else {
-            listaInimigos.add(new Corvo(xInicial, yAleatorio, 40f, 40f, assets.somDano));
+            listaInimigos.add(new Goblin(xInicial, yAleatorio, 40f, 40f, assets.somDano, assets));
         }
     } 
 

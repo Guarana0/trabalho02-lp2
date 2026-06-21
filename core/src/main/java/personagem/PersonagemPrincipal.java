@@ -63,8 +63,6 @@ public class PersonagemPrincipal extends Personagem implements Explodivel{
 
     apertouEsp = Gdx.input.isKeyPressed(Input.Keys.SPACE) || Gdx.input.isTouched();
 
-    Estado estadoAnterior = estado;
-
         if (apertouEsp) {
             if (velocidadeY < 0) {
                 velocidadeY *= 0.5f; // reduz a queda antes de subir
