@@ -3,6 +3,7 @@ package br.com.lgalarane.trabalho02;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 
@@ -24,7 +25,12 @@ public class GameAssets {
     public TextureRegion texRegFundoNeve;
     public TextureRegion texRegFundoConcreto;
 
+<<<<<<< HEAD
+    public TextureRegion personagem;
+    public Animation<TextureRegion> animacaoPersonagem;
+=======
     public Array<TextureRegion> framesExplosao;
+>>>>>>> main
 
     public Texture texPersonagem;
     public Array<TextureRegion> frameAnd;
@@ -50,6 +56,7 @@ public class GameAssets {
         managerAsset.load("textures/fogofundo.png", Texture.class);
         managerAsset.load("textures/nevefundo.png", Texture.class);
         managerAsset.load("textures/concretofundo.png", Texture.class);
+        managerAsset.load("textures/personagem.png", Texture.class);
 
         managerAsset.load("textures/personagem.png", Texture.class);
 
@@ -77,7 +84,11 @@ public class GameAssets {
         texRegFundoFogo = new TextureRegion(managerAsset.get("textures/fogofundo.png", Texture.class));
         texRegFundoNeve = new TextureRegion(managerAsset.get("textures/nevefundo.png", Texture.class));
         texRegFundoConcreto = new TextureRegion(managerAsset.get("textures/concretofundo.png", Texture.class));
+        
+        Texture texturaPersonagem = managerAsset.get("textures/personagem.png", Texture.class);
+        personagem = new TextureRegion(texturaPersonagem);
 
+<<<<<<< HEAD
         // IA para a criação de design do sprite
         texPersonagem = managerAsset.get("textures/personagem.png", Texture.class);
         
@@ -105,6 +116,10 @@ public class GameAssets {
             
             framesExplosao.add(new TextureRegion(tex));
         }
+=======
+        // Inicializa a animação com 0.1f segundos de intervalo por frame
+        animacaoPersonagem = new Animation<>(0.1f, framesAnimacao);
+>>>>>>> main
     }
 
     public void limparAssets() {
