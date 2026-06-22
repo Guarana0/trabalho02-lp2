@@ -6,6 +6,7 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Game; 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -56,6 +57,8 @@ public class Jogo extends ApplicationAdapter {
     private final ArrayList<EfeitoExplosao> explosoesAtivas = new ArrayList<>();
     private boolean iniciouAnimacaoMorte = false;
 
+    private Missil ultimoMissilAvistado = null;
+
     private static class EfeitoExplosao {
         float x, y;
         float tempoDeVida = 0f;
@@ -105,6 +108,27 @@ public class Jogo extends ApplicationAdapter {
 
         personagem = new PersonagemPrincipal(0f, 100f, 130f, 170f, assets.somDano, assets);
         areaMoeda = new Rectangle();
+
+        assets.musica1.setVolume(1.2f);
+        assets.musica2.setVolume(1.2f);
+
+        // quando a 1 terminar, começará a 2
+        assets.musica1.setOnCompletionListener(new Music.OnCompletionListener() {
+            @Override
+            public void onCompletion(Music music) {
+                assets.musica2.play();
+            }
+        });
+
+        //quando a 2 terminar, começará a 1 de novo
+        assets.musica2.setOnCompletionListener(new Music.OnCompletionListener() {
+            @Override
+            public void onCompletion(Music music) {
+                assets.musica1.play();
+            }
+        });
+
+        assets.musica1.play();
     }
 
     @Override
@@ -208,12 +232,14 @@ public class Jogo extends ApplicationAdapter {
 
     private void verificarColisaoObstaculos() {
         Rectangle colisaoJogador = personagem.getColisao();
+        Missil missilAtualNaTela = null;
         
         for (int i = geradorCenario.getObjetosAtivos().size - 1; i >= 0; i--) {
             ObjetoDeJogo obj = geradorCenario.getObjetosAtivos().get(i);
             
             if (obj instanceof Missil) {
                 Missil missil = (Missil) obj;
+                missilAtualNaTela = missil; // Registra que existe um míssil ativo
                 
                 float xMissilTela = missil.getPosicao().x - posicaoMapaX + 100f;
                 float yMissilTela = missil.getPosicao().y;
@@ -221,6 +247,9 @@ public class Jogo extends ApplicationAdapter {
                 Rectangle areaMissilTela = new Rectangle(xMissilTela, yMissilTela, 32f, 32f);
                 
                 if (colisaoJogador.overlaps(areaMissilTela)) {
+                    // Toca o som de explosão ao colidir com o míssil!
+                    assets.somMissilExplosao.play(0.33f);
+
                     if (personagem.temEscudo()) {
                         personagem.desativarEscudo(); 
                     } else {
@@ -232,9 +261,21 @@ public class Jogo extends ApplicationAdapter {
                     }
                     
                     geradorCenario.getObjetosAtivos().removeIndex(i); 
+                    if (ultimoMissilAvistado == missil) {
+                        ultimoMissilAvistado = null; 
+                    }
                     break; 
                 }
             }
+        }
+
+        if (missilAtualNaTela != null) {
+            if (missilAtualNaTela != ultimoMissilAvistado) {
+                assets.somMissilVoando.play(0.15f);
+                ultimoMissilAvistado = missilAtualNaTela; 
+            }
+        } else {
+            ultimoMissilAvistado = null;
         }
     }
 
@@ -260,6 +301,7 @@ public class Jogo extends ApplicationAdapter {
             areaMoeda.set(xTela, yTela, 32f, 32f);
 
             if (colisaoJogador.overlaps(areaMoeda)) {
+                assets.somMoeda.play(0.15f);
                 personagem.adicionarMoeda();
                 geradorCenario.getObjetosAtivos().removeIndex(i);
             }
@@ -282,13 +324,24 @@ public class Jogo extends ApplicationAdapter {
     public void fimJogo() {
         if (personagem.deveExplodir(personagem.getColisao().x, personagem.getColisao().y)) {
             if (!iniciouAnimacaoMorte) {
+                if (assets.musica1.isPlaying()) {
+                    assets.musica1.stop();
+                }
+                if (assets.musica2.isPlaying()) {
+                    assets.musica2.stop();
+                }
+
+                assets.musicaMorte.setLooping(true);
+                assets.musicaMorte.setVolume(0.6f);
+                assets.musicaMorte.play();
+
                 explosoesAtivas.add(new EfeitoExplosao(personagem.getColisao().x, personagem.getColisao().y));
                 iniciouAnimacaoMorte = true;
             }
 
             if (iniciouAnimacaoMorte && explosoesAtivas.isEmpty()) {
-                this.dispose();
-                game.setScreen(new MorteScreen(game));
+                this.dispose(); 
+                game.setScreen(new MorteScreen(game, assets)); 
             }
         }
     }
@@ -298,6 +351,5 @@ public class Jogo extends ApplicationAdapter {
         batch.dispose();
         shapeRenderer.dispose(); 
         font.dispose();
-        assets.limparAssets();
     }
 }
