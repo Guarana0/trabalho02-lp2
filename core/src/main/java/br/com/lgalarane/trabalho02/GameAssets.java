@@ -17,9 +17,10 @@ public class GameAssets {
     public TextureRegion texRegFogo;
     public TextureRegion texRegNeve;
     public TextureRegion texRegGrama;
-    public TextureRegion texRegMoeda;  
+    public TextureRegion texRegMoeda;
+    public TextureRegion texRegVida;
     public TextureRegion texRegGranada;
-    public TextureRegion texRegMissil; 
+    public TextureRegion texRegMissil;
 
     public TextureRegion texRegFundoGrama;
     public TextureRegion texRegFundoFogo;
@@ -71,8 +72,9 @@ public class GameAssets {
         managerAsset.load("textures/neve.png", Texture.class);
         managerAsset.load("textures/grama.png", Texture.class);
         managerAsset.load("textures/moeda.png", Texture.class);
-        managerAsset.load("textures/granada.png", Texture.class); 
-        managerAsset.load("textures/missil.png", Texture.class); 
+        managerAsset.load("textures/vida.png", Texture.class);
+        managerAsset.load("textures/granada.png", Texture.class);
+        managerAsset.load("textures/missil.png", Texture.class);
 
         managerAsset.load("textures/gramafundo.png", Texture.class);
         managerAsset.load("textures/fogofundo.png", Texture.class);
@@ -108,10 +110,11 @@ public class GameAssets {
         texRegFogo = new TextureRegion(managerAsset.get("textures/fogo.png", Texture.class));
         texRegNeve = new TextureRegion(managerAsset.get("textures/neve.png", Texture.class));
         texRegGrama = new TextureRegion(managerAsset.get("textures/grama.png", Texture.class));
-        
+
         texRegMoeda = new TextureRegion(managerAsset.get("textures/moeda.png", Texture.class));
+        texRegVida = new TextureRegion(managerAsset.get("textures/vida.png", Texture.class));
         texRegGranada = new TextureRegion(managerAsset.get("textures/granada.png", Texture.class));
-        
+
         texRegMissil = new TextureRegion(managerAsset.get("textures/missil.png", Texture.class));
 
         texRegFundoGrama = new TextureRegion(managerAsset.get("textures/gramafundo.png", Texture.class));
@@ -121,10 +124,10 @@ public class GameAssets {
 
         // IA para a criação de design do sprite
         texPersonagem = managerAsset.get("textures/personagem.png", Texture.class);
-        
+
         int frameW = 426;
         int frameH = 1440;
-        
+
         framesCorrendo = new Array<>();
         framesCorrendo.add(new TextureRegion(texPersonagem, 0 * frameW, 0, frameW, frameH));
         framesCorrendo.add(new TextureRegion(texPersonagem, 1 * frameW, 0, frameW, frameH));
@@ -139,10 +142,9 @@ public class GameAssets {
         for (int i = 0; i < 24; i++) {
             String caminhoFrame = String.format("textures/explosao_frames/explosao_%02d.png", i);
             Texture tex = managerAsset.get(caminhoFrame, Texture.class);
-            
 
             tex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-            
+
             framesExplosao.add(new TextureRegion(tex));
         }
     }
