@@ -21,8 +21,11 @@ public class MorteScreen extends ScreenAdapter {
     private GlyphLayout layout;
     private float tempo;
 
-    public MorteScreen(Game jogo) {
+    private GameAssets assets;
+
+    public MorteScreen(Game jogo, GameAssets assets) {
         this.jogo = jogo;
+        this.assets = assets;
     }
 
     @Override
@@ -40,43 +43,40 @@ public class MorteScreen extends ScreenAdapter {
     @Override
     public void render(float delta) {
         tempo += delta;
-        
-        // Limpa a tela com um fundo vermelho bem escuro
+
         ScreenUtils.clear(0.15f, 0.02f, 0.02f, 1f);
 
         if (Gdx.input.isTouched()) {
+            assets.musicaMorte.stop();        
             jogo.setScreen(new JogoScreen(jogo));
             return;        
         } else if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
-            // Correção: Transição de volta para o Menu Principal usando a instância correta do jogo
-            jogo.setScreen(new TelaMenu(jogo));
+            assets.musicaMorte.stop();
+            jogo.setScreen(new TelaMenu(jogo, assets));
             return;
         }
 
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
 
-        // DEGRADE DO FUNDO (Tons de Vermelho)
         forma.begin(ShapeType.Filled);
         forma.rect(0, 0, w, h, 
                 new Color(0.2f, 0.02f, 0.02f, 1), new Color(0.2f, 0.02f, 0.02f, 1),
                 new Color(0.4f, 0.05f, 0.05f, 1), new Color(0.4f, 0.05f, 0.05f, 1));
 
-        // 2. Painel Central Estilizado (Ajustado para combinar com o tema vermelho)
         float pW = w * 0.6f, pH = 200f;
         float pX = (w - pW) / 2f, pY = (h - pH) / 2f;
 
         forma.setColor(0.3f, 0.05f, 0.05f, 0.8f);
-        forma.rect(pX, pY, pW, pH); // Fundo do painel
+        forma.rect(pX, pY, pW, pH); 
         forma.setColor(0.6f, 0.2f, 0.2f, 0.4f);
-        forma.rect(pX, pY + pH - 5, pW, 5); // Borda superior
+        forma.rect(pX, pY + pH - 5, pW, 5);
         forma.end();
 
         lote.begin();
         String titulo = "VOCÊ MORREU!";
         String instrucao = "CLIQUE PARA JOGAR DE NOVO OU ENTER PARA O MENU";
 
-        // Efeito de brilho na instrução
         float alpha = 0.5f + 0.5f * MathUtils.sin(tempo * 3f);
 
         desenharTextoSombreado(titulo, fonteTitulo, h * 0.6f, Color.WHITE, Color.BLACK);
@@ -89,9 +89,9 @@ public class MorteScreen extends ScreenAdapter {
         layout.setText(fonte, texto);
         float x = (Gdx.graphics.getWidth() - layout.width) / 2f;
         fonte.setColor(sombra);
-        fonte.draw(lote, texto, x + 2, y - 2); // Sombra
+        fonte.draw(lote, texto, x + 2, y - 2); 
         fonte.setColor(cor);
-        fonte.draw(lote, texto, x, y); // Texto principal
+        fonte.draw(lote, texto, x, y); 
     }
 
     @Override
