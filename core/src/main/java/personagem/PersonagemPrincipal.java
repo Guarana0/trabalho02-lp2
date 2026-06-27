@@ -42,6 +42,11 @@ public class PersonagemPrincipal extends Personagem implements Explodivel{
         this.protegidoPorEscudo = false;
         this.vida = 3;
 
+        // Redimensiona a caixa de colisão para ser menor que o sprite
+        float larguraColisao = largura * 0.5f;
+        float alturaColisao = altura * 0.7f;
+        this.areaColisao.setSize(larguraColisao, alturaColisao);
+
         animCorrendo = new Animation<>(0.1f, assets.framesCorrendo, Animation.PlayMode.LOOP);
         animVoando   = new Animation<>(0.1f, assets.framesVoando,   Animation.PlayMode.LOOP);
     }
@@ -93,8 +98,9 @@ public class PersonagemPrincipal extends Personagem implements Explodivel{
             velocidadeY = 0;
         }
 
+        float xColisao = POSICAO_FIXA_TELA_X + (dimensoes.x - areaColisao.width) / 2f;
         posicao.set(POSICAO_FIXA_TELA_X, novoY);
-        areaColisao.setPosition(POSICAO_FIXA_TELA_X, novoY);
+        areaColisao.setPosition(xColisao, novoY);
     }
 
     public void renderizar(SpriteBatch batch) {

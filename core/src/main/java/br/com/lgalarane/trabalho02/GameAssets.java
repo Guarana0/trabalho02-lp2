@@ -36,44 +36,52 @@ public class GameAssets {
     public Texture texGoblin;
     public Texture texCorvo;
 
+    // Frames/Animações separadas por inimigo
+    public Array<TextureRegion> framesCorrendoEsqueleto;
+    public Array<TextureRegion> framesCorrendoGoblin;
+    public Array<TextureRegion> framesPulandoGoblin;
+
+    public Array<TextureRegion> framesVoandoCorvo;
+
 
     public GameAssets() {
         this.managerAsset = new AssetManager();
     }
 
     public void carregaEsqueleto() {
-        int frameW = 256;
+        int frameW = 64;
         int frameH = 64;
 
-        framesCorrendo = new Array<>();
-        framesCorrendo.add(new TextureRegion(texEsqueleto, 0 * frameW, 0, frameW, frameH));
-        framesCorrendo.add(new TextureRegion(texEsqueleto, 1 * frameW, 0, frameW, frameH));
-        framesCorrendo.add(new TextureRegion(texEsqueleto, 3 * frameW, 0, frameW, frameH));
-        framesCorrendo.add(new TextureRegion(texEsqueleto, 4 * frameW, 0, frameW, frameH));
+        framesCorrendoEsqueleto = new Array<>();
+        framesCorrendoEsqueleto.add(new TextureRegion(texEsqueleto, 0 * frameW, 0, frameW, frameH));
+        framesCorrendoEsqueleto.add(new TextureRegion(texEsqueleto, 1 * frameW, 0, frameW, frameH));
+        framesCorrendoEsqueleto.add(new TextureRegion(texEsqueleto, 2 * frameW, 0, frameW, frameH));
+        framesCorrendoEsqueleto.add(new TextureRegion(texEsqueleto, 3 * frameW, 0, frameW, frameH));
     }
 
     public void carregaGoblin() {
-        int frameW = 256;
+        int frameW = 64;
         int frameH = 64;
 
-        framesCorrendo = new Array<>();
-        framesCorrendo.add(new TextureRegion(texGoblin, 0 * frameW, 0, frameW, frameH));
-        framesCorrendo.add(new TextureRegion(texGoblin, 1 * frameW, 0, frameW, frameH));
-        framesCorrendo.add(new TextureRegion(texGoblin, 3 * frameW, 0, frameW, frameH));
+        framesCorrendoGoblin = new Array<>();
+        framesCorrendoGoblin.add(new TextureRegion(texGoblin, 0 * frameW, 0, frameW, frameH));
+        framesCorrendoGoblin.add(new TextureRegion(texGoblin, 1 * frameW, 0, frameW, frameH));
+        framesCorrendoGoblin.add(new TextureRegion(texGoblin, 2 * frameW, 0, frameW, frameH));
+        framesCorrendoGoblin.add(new TextureRegion(texGoblin, 3 * frameW, 0, frameW, frameH));
 
-        framePulando = new Array<>();
-        framePulando.add(new TextureRegion(texGoblin, 4 * frameW, 0, frameW, frameH));
+        framesPulandoGoblin = new Array<>();
+        framesPulandoGoblin.add(new TextureRegion(texGoblin, 0 * frameW, 0, frameW, frameH)); // Frame de fallback
     }
 
     public void carregaCorvo() {
-        int frameW = 256;
+        int frameW = 64;
         int frameH = 64;
 
-        framesVoando = new Array<>();
-        framesVoando.add(new TextureRegion(texCorvo, 0 * frameW, 0, frameW, frameH));
-        framesVoando.add(new TextureRegion(texCorvo, 1 * frameW, 0, frameW, frameH));
-        framesVoando.add(new TextureRegion(texCorvo, 2 * frameW, 0, frameW, frameH));
-        framesVoando.add(new TextureRegion(texCorvo, 3 * frameW, 0, frameW, frameH));
+        framesVoandoCorvo = new Array<>();
+        framesVoandoCorvo.add(new TextureRegion(texCorvo, 0 * frameW, 0, frameW, frameH));
+        framesVoandoCorvo.add(new TextureRegion(texCorvo, 1 * frameW, 0, frameW, frameH));
+        framesVoandoCorvo.add(new TextureRegion(texCorvo, 2 * frameW, 0, frameW, frameH));
+        framesVoandoCorvo.add(new TextureRegion(texCorvo, 3 * frameW, 0, frameW, frameH));
     }
 
     public void carregaTodosAssets() {
@@ -96,6 +104,7 @@ public class GameAssets {
         managerAsset.load("textures/personagem.png", Texture.class);
         managerAsset.load("textures/skeletonSprite.png", Texture.class);
         managerAsset.load("textures/goblinSprite.png", Texture.class);
+        managerAsset.load("textures/corvoSprite.png", Texture.class);
 
 
         for (int i = 0; i < 24; i++) {
@@ -127,6 +136,7 @@ public class GameAssets {
         texPersonagem = managerAsset.get("textures/personagem.png", Texture.class);
         texEsqueleto = managerAsset.get("textures/skeletonSprite.png", Texture.class);
         texGoblin = managerAsset.get("textures/goblinSprite.png", Texture.class);
+        texCorvo = managerAsset.get("textures/corvoSprite.png", Texture.class);
 
         // tudo abaixo até a linha 100 foi utilizado IA
         int frameW = 426;
@@ -144,6 +154,11 @@ public class GameAssets {
 
         carregaEsqueleto();
         carregaGoblin();
+        carregaCorvo();
+
+        if (texEsqueleto != null) texEsqueleto.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        if (texGoblin != null) texGoblin.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        if (texCorvo != null) texCorvo.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
         framesExplosao = new Array<>();
         for (int i = 0; i < 24; i++) {

@@ -26,6 +26,7 @@ import objetos.ObjetoDeJogo;
 import personagem.Inimigo;
 import personagem.Inimigos.Esqueleto;
 import personagem.Inimigos.Goblin;
+import personagem.Inimigos.Corvo;
 
 import personagem.PersonagemPrincipal;
 
@@ -183,6 +184,8 @@ public class Jogo extends ApplicationAdapter {
                     esqueleto.renderizar(batch);
                 } else if (inimigo instanceof Goblin goblin) {
                     goblin.renderizar(batch);
+                } else if (inimigo instanceof Corvo corvo) {
+                    corvo.renderizar(batch);
                 }
             }
 
@@ -271,14 +274,17 @@ public class Jogo extends ApplicationAdapter {
 
     public void spawnInimigo() {
         float xInicial = larguraMundo + 50f;
-        float yAleatorio = MathUtils.random(50f, alturaMundo - 100f);
+        int tipoInimigo = MathUtils.random(0, 2);
+        float inimigoLargura = 80f;
+        float inimigoAltura = 80f;
 
-        int tipoInimigo = MathUtils.random(0, 1);
-
-        if (tipoInimigo == 0) {
-            listaInimigos.add(new Esqueleto(xInicial, yAleatorio, 40f, 40f, assets.somDano, assets));
-        } else {
-            listaInimigos.add(new Goblin(xInicial, yAleatorio, 40f, 40f, assets.somDano, assets));
+        if (tipoInimigo == 0) { // Esqueleto (chão)
+            listaInimigos.add(new Esqueleto(xInicial, 32f, inimigoLargura, inimigoAltura, assets.somDano, assets));
+        } else if (tipoInimigo == 1) { // Goblin (chão)
+            listaInimigos.add(new Goblin(xInicial, 32f, inimigoLargura, inimigoAltura, assets.somDano, assets));
+        } else { // Corvo (voador)
+            float yAleatorio = MathUtils.random(alturaMundo / 3f, alturaMundo - 120f);
+            listaInimigos.add(new Corvo(xInicial, yAleatorio, inimigoLargura, inimigoAltura, assets.somDano, assets));
         }
     } 
 

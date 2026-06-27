@@ -9,17 +9,26 @@ import personagem.Inimigo;
 
 public class Esqueleto extends Inimigo {
 
-    private final TextureRegion texturaEsqueleto;
+    private final com.badlogic.gdx.graphics.g2d.Animation<TextureRegion> animCorrendo;
+    private float stateTime = 0f;
 
     public Esqueleto(float x, float y, float largura, float altura, Sound somDano, GameAssets assets) {
         super(x, y, largura, altura, somDano);
-        this.texturaEsqueleto = new TextureRegion(assets.texEsqueleto);
+
+        // Usa frames específicos do esqueleto carregados no GameAssets
+        animCorrendo = new com.badlogic.gdx.graphics.g2d.Animation<>(
+                0.1f,
+                assets.framesCorrendoEsqueleto,
+                com.badlogic.gdx.graphics.g2d.Animation.PlayMode.LOOP
+        );
     }
 
     public void renderizar(SpriteBatch batch) {
-        TextureRegion frame = texturaEsqueleto;
+        stateTime += com.badlogic.gdx.Gdx.graphics.getDeltaTime();
+        TextureRegion frame = animCorrendo.getKeyFrame(stateTime, true);
         batch.draw(frame, posicao.x, posicao.y, dimensoes.x, dimensoes.y);
     }
 }
+
 
 
