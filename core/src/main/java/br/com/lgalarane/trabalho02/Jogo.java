@@ -25,8 +25,10 @@ import mapa.planosdefundo.GeradorFundo;
 import mapa.tiles.MoedaTile;
 import objetos.ObjetoDeJogo;
 import personagem.Inimigo;
-import personagem.Inimigos.Corvo;
 import personagem.Inimigos.Esqueleto;
+import personagem.Inimigos.Goblin;
+import personagem.Inimigos.Corvo;
+
 import personagem.PersonagemPrincipal;
 
 public class Jogo extends ApplicationAdapter {
@@ -175,7 +177,7 @@ public class Jogo extends ApplicationAdapter {
         TipoBioma biomaAtivo = geradorCenario.getBiomaSobOJogador(posicaoMapaX);
         geradorFundo.renderizar(batch, biomaAtivo);
         geradorCenario.renderizar(batch, posicaoMapaX);
-
+        
         for (EfeitoExplosao exp : explosoesAtivas) {
             TextureRegion frameAtual = animacaoExplosao.getKeyFrame(exp.tempoDeVida);
             batch.draw(frameAtual, exp.x, exp.y, 32f, 32f);
@@ -199,10 +201,22 @@ public class Jogo extends ApplicationAdapter {
         batch.draw(assets.texRegGranada, 10, hudTop - 95, 24, 24);
         font.draw(batch, "x" + granadas, 40, hudTop - 78);
 
+        // Render principal com SpriteBatch
         if (personagem.getVida() > 0) {
             personagem.renderizar(batch);
         }
 
+            for (Inimigo inimigo : listaInimigos) {
+                if (inimigo instanceof Esqueleto esqueleto) {
+                    esqueleto.renderizar(batch);
+                } else if (inimigo instanceof Goblin goblin) {
+                    goblin.renderizar(batch);
+                } else if (inimigo instanceof Corvo corvo) {
+                    corvo.renderizar(batch);
+                }
+            }
+
+        batch.end();
         batch.end();
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
@@ -313,14 +327,17 @@ public class Jogo extends ApplicationAdapter {
 
     public void spawnInimigo() {
         float xInicial = larguraMundo + 50f;
-        float yAleatorio = MathUtils.random(50f, alturaMundo - 100f);
+        int tipoInimigo = MathUtils.random(0, 2);
+        float inimigoLargura = 80f;
+        float inimigoAltura = 80f;
 
-        int tipoInimigo = MathUtils.random(0, 1);
-
-        if (tipoInimigo == 0) {
-            listaInimigos.add(new Esqueleto(xInicial, yAleatorio, 40f, 40f, assets.somDano));
-        } else {
-            listaInimigos.add(new Corvo(xInicial, yAleatorio, 40f, 40f, assets.somDano));
+        if (tipoInimigo == 0) { // Esqueleto (chão)
+            listaInimigos.add(new Esqueleto(xInicial, 32f, inimigoLargura, inimigoAltura, assets.somDano, assets));
+        } else if (tipoInimigo == 1) { // Goblin (chão)
+            listaInimigos.add(new Goblin(xInicial, 32f, inimigoLargura, inimigoAltura, assets.somDano, assets));
+        } else { // Corvo (voador)
+            float yAleatorio = MathUtils.random(alturaMundo / 3f, alturaMundo - 120f);
+            listaInimigos.add(new Corvo(xInicial, yAleatorio, inimigoLargura, inimigoAltura, assets.somDano, assets));
         }
     }
 

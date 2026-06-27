@@ -30,9 +30,22 @@ public class GameAssets {
     public Array<TextureRegion> framesExplosao;
 
     public Texture texPersonagem;
-    public Array<TextureRegion> frameAnd;
+
     public Array<TextureRegion> framesCorrendo;
     public Array<TextureRegion> framesVoando;
+    public Array<TextureRegion> framePulando;
+
+    public Texture texEsqueleto;
+    public Texture texGoblin;
+    public Texture texCorvo;
+
+    // Frames/Animações separadas por inimigo
+    public Array<TextureRegion> framesCorrendoEsqueleto;
+    public Array<TextureRegion> framesCorrendoGoblin;
+    public Array<TextureRegion> framesPulandoGoblin;
+
+    public Array<TextureRegion> framesVoandoCorvo;
+
 
     public Sound somPulo;
     public Sound somTiro;
@@ -48,6 +61,42 @@ public class GameAssets {
 
     public GameAssets() {
         this.managerAsset = new AssetManager();
+    }
+
+    public void carregaEsqueleto() {
+        int frameW = 64;
+        int frameH = 64;
+
+        framesCorrendoEsqueleto = new Array<>();
+        framesCorrendoEsqueleto.add(new TextureRegion(texEsqueleto, 0 * frameW, 0, frameW, frameH));
+        framesCorrendoEsqueleto.add(new TextureRegion(texEsqueleto, 1 * frameW, 0, frameW, frameH));
+        framesCorrendoEsqueleto.add(new TextureRegion(texEsqueleto, 2 * frameW, 0, frameW, frameH));
+        framesCorrendoEsqueleto.add(new TextureRegion(texEsqueleto, 3 * frameW, 0, frameW, frameH));
+    }
+
+    public void carregaGoblin() {
+        int frameW = 64;
+        int frameH = 64;
+
+        framesCorrendoGoblin = new Array<>();
+        framesCorrendoGoblin.add(new TextureRegion(texGoblin, 0 * frameW, 0, frameW, frameH));
+        framesCorrendoGoblin.add(new TextureRegion(texGoblin, 1 * frameW, 0, frameW, frameH));
+        framesCorrendoGoblin.add(new TextureRegion(texGoblin, 2 * frameW, 0, frameW, frameH));
+        framesCorrendoGoblin.add(new TextureRegion(texGoblin, 3 * frameW, 0, frameW, frameH));
+
+        framesPulandoGoblin = new Array<>();
+        framesPulandoGoblin.add(new TextureRegion(texGoblin, 0 * frameW, 0, frameW, frameH)); // Frame de fallback
+    }
+
+    public void carregaCorvo() {
+        int frameW = 64;
+        int frameH = 64;
+
+        framesVoandoCorvo = new Array<>();
+        framesVoandoCorvo.add(new TextureRegion(texCorvo, 0 * frameW, 0, frameW, frameH));
+        framesVoandoCorvo.add(new TextureRegion(texCorvo, 1 * frameW, 0, frameW, frameH));
+        framesVoandoCorvo.add(new TextureRegion(texCorvo, 2 * frameW, 0, frameW, frameH));
+        framesVoandoCorvo.add(new TextureRegion(texCorvo, 3 * frameW, 0, frameW, frameH));
     }
 
     public void carregaTodosAssets() {
@@ -81,7 +130,12 @@ public class GameAssets {
         managerAsset.load("textures/nevefundo.png", Texture.class);
         managerAsset.load("textures/concretofundo.png", Texture.class);
 
+        // texturas do personagem e dos inimigos
         managerAsset.load("textures/personagem.png", Texture.class);
+        managerAsset.load("textures/skeletonSprite.png", Texture.class);
+        managerAsset.load("textures/goblinSprite.png", Texture.class);
+        managerAsset.load("textures/corvoSprite.png", Texture.class);
+
 
         for (int i = 0; i < 24; i++) {
             // String.format("%02d", i) transforma o número 0 em "00", 1 em "01", etc.
@@ -124,6 +178,11 @@ public class GameAssets {
 
         // IA para a criação de design do sprite
         texPersonagem = managerAsset.get("textures/personagem.png", Texture.class);
+        texEsqueleto = managerAsset.get("textures/skeletonSprite.png", Texture.class);
+        texGoblin = managerAsset.get("textures/goblinSprite.png", Texture.class);
+        texCorvo = managerAsset.get("textures/corvoSprite.png", Texture.class);
+
+        // tudo abaixo até a linha 100 foi utilizado IA
 
         int frameW = 426;
         int frameH = 1440;
@@ -137,6 +196,14 @@ public class GameAssets {
         framesVoando = new Array<>();
         framesVoando.add(new TextureRegion(texPersonagem, 4 * frameW, 0, frameW, frameH));
         framesVoando.add(new TextureRegion(texPersonagem, 5 * frameW, 0, frameW, frameH));
+
+        carregaEsqueleto();
+        carregaGoblin();
+        carregaCorvo();
+
+        if (texEsqueleto != null) texEsqueleto.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        if (texGoblin != null) texGoblin.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        if (texCorvo != null) texCorvo.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
         framesExplosao = new Array<>();
         for (int i = 0; i < 24; i++) {
