@@ -53,8 +53,9 @@ public abstract class Personagem {
 
     public int darDano(int dano) {
         this.vida -= dano;
-        if (this.vida < 0) {
+        if (this.vida <= 0) {
             this.vida = 0;
+            this.estaVivo = false;
         }
         return this.vida;
     }
@@ -69,8 +70,9 @@ public abstract class Personagem {
         }
 
         this.vida -= danoRecebido;
-        if (this.vida < 0) {
+        if (this.vida <= 0) {
             this.vida = 0;
+            this.estaVivo = false;
         }
         return this.vida;
     }

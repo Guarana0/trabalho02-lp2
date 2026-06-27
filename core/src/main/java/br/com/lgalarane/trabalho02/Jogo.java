@@ -3,7 +3,7 @@ package br.com.lgalarane.trabalho02;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Game; 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Music;
@@ -25,33 +25,39 @@ import mapa.planosdefundo.GeradorFundo;
 import mapa.tiles.MoedaTile;
 import objetos.ObjetoDeJogo;
 import personagem.Inimigo;
-import personagem.Inimigos.Corvo;
 import personagem.Inimigos.Esqueleto;
+import personagem.Inimigos.Goblin;
+import poderes.*;
+import personagem.Inimigos.Corvo;
+
 import personagem.PersonagemPrincipal;
 
 public class Jogo extends ApplicationAdapter {
-    private final Game game; 
+    private final Game game;
 
     private SpriteBatch batch;
-    private ShapeRenderer shapeRenderer; 
+    private ShapeRenderer shapeRenderer;
     private BitmapFont font;
     private GeradorCenario geradorCenario;
     private GeradorFundo geradorFundo;
-    
+
     private GameAssets assets;
-    private PersonagemPrincipal personagem; 
+    private PersonagemPrincipal personagem;
 
     private ArrayList<Inimigo> listaInimigos;
+    private ArrayList<Poder> listaPoderes;
     private Rectangle areaMoeda;
 
     private float posicaoMapaX = 0f;
-    private final float VELOCIDADE_MAPA = 150f; 
+    private final float VELOCIDADE_MAPA = 150f;
 
-    float larguraMundo; 
+    float larguraMundo;
     float alturaMundo;
 
     private float tempoDesdeUltimoInimigo = 0f;
-    private final float TEMPO_SPAWN = 3f; 
+    private final float TEMPO_SPAWN = 3f;
+    private float tempoDesdeUltimoPoder = 0f;
+    private final float TEMPO_SPAWN_PODER = 6f; 
 
     private Animation<TextureRegion> animacaoExplosao;
     private final ArrayList<EfeitoExplosao> explosoesAtivas = new ArrayList<>();
@@ -77,36 +83,36 @@ public class Jogo extends ApplicationAdapter {
     public void create() {
         larguraMundo = Gdx.graphics.getWidth();
         alturaMundo = Gdx.graphics.getHeight();
-        
+
         listaInimigos = new ArrayList<>();
+
+        listaPoderes = new ArrayList<>();
 
         assets = new GameAssets();
         assets.carregaTodosAssets();
 
         batch = new SpriteBatch();
-        shapeRenderer = new ShapeRenderer(); 
+        shapeRenderer = new ShapeRenderer();
         font = new BitmapFont();
         font.setColor(Color.WHITE);
 
         animacaoExplosao = new Animation<>(0.04f, assets.framesExplosao, Animation.PlayMode.NORMAL);
 
         geradorCenario = new GeradorCenario(
-            assets.texRegConcreto, 
-            assets.texRegFogo, 
-            assets.texRegNeve, 
-            assets.texRegGrama, 
-            assets.texRegMoeda,
-            assets.texRegMissil
-        );
+                assets.texRegConcreto,
+                assets.texRegFogo,
+                assets.texRegNeve,
+                assets.texRegGrama,
+                assets.texRegMoeda,
+                assets.texRegMissil);
 
         geradorFundo = new GeradorFundo(
-            assets.texRegFundoGrama,
-            assets.texRegFundoFogo,
-            assets.texRegFundoNeve,
-            assets.texRegFundoConcreto
-        );
+                assets.texRegFundoGrama,
+                assets.texRegFundoFogo,
+                assets.texRegFundoNeve,
+                assets.texRegFundoConcreto);
 
-        personagem = new PersonagemPrincipal(0f, 100f, 130f, 170f, assets.somDano, assets);
+        personagem = new PersonagemPrincipal(0f, 100f, 100f, 130f, assets.somDano, assets);
         areaMoeda = new Rectangle();
 
         assets.musica1.setVolume(1.2f);
@@ -120,7 +126,7 @@ public class Jogo extends ApplicationAdapter {
             }
         });
 
-        //quando a 2 terminar, começará a 1 de novo
+        // quando a 2 terminar, começará a 1 de novo
         assets.musica2.setOnCompletionListener(new Music.OnCompletionListener() {
             @Override
             public void onCompletion(Music music) {
@@ -141,16 +147,16 @@ public class Jogo extends ApplicationAdapter {
             personagem.atualizar(delta, VELOCIDADE_MAPA);
             posicaoMapaX += VELOCIDADE_MAPA * delta;
 
-            geradorCenario.atualizar(posicaoMapaX, delta); 
+            geradorCenario.atualizar(posicaoMapaX, delta);
             verificarColetaMoedas();
-            verificarColisaoObstaculos(); 
+            verificarColisaoObstaculos();
             verificarColisaoInimigos();
             verificarInputGranada();
 
             tempoDesdeUltimoInimigo += delta;
             if (tempoDesdeUltimoInimigo >= TEMPO_SPAWN) {
                 spawnInimigo();
-                tempoDesdeUltimoInimigo = 0f; 
+                tempoDesdeUltimoInimigo = 0f;
             }
 
             for (int i = listaInimigos.size() - 1; i >= 0; i--) {
@@ -158,7 +164,50 @@ public class Jogo extends ApplicationAdapter {
                 inimigo.update(delta);
 
                 if (!inimigo.getAtivo()) {
-                    listaInimigos.remove(i); 
+                    listaInimigos.remove(i);
+                }
+            }
+
+            tempoDesdeUltimoPoder += delta;
+            if (tempoDesdeUltimoPoder >= TEMPO_SPAWN_PODER) {
+                spawnPoder();
+                tempoDesdeUltimoPoder = 0f;
+            }
+
+            for (int i = listaPoderes.size() - 1; i >= 0; i--) {
+                Poder poder = listaPoderes.get(i);
+                if (poder instanceof Escudo escudo) {
+                    // Verifica colisão convertendo coordenadas do mundo para tela
+                    Rectangle areaItemTela = new Rectangle();
+                    areaItemTela.set(escudo.getAreaItem());
+                    areaItemTela.setPosition(
+                        escudo.getAreaItem().x - posicaoMapaX + 100f,
+                        escudo.getAreaItem().y
+                    );
+
+                    if (!escudo.estaAtivo() && personagem.getColisao().overlaps(areaItemTela)) {
+                        escudo.setEstaAtivo(true);
+                        escudo.getAreaItem().set(0, 0, 0, 0);
+                    }
+                    escudo.atualizar(delta, personagem);
+                } else if (poder instanceof Ima ima) {
+                    // Verifica colisão convertendo coordenadas do mundo para tela
+                    Rectangle areaItemTela = new Rectangle();
+                    areaItemTela.set(ima.getAreaItem());
+                    areaItemTela.setPosition(
+                        ima.getAreaItem().x - posicaoMapaX + 100f,
+                        ima.getAreaItem().y
+                    );
+
+                    if (!ima.estaAtivo() && personagem.getColisao().overlaps(areaItemTela)) {
+                        ima.setEstaAtivo(true);
+                        ima.getAreaItem().set(0, 0, 0, 0);
+                    }
+                    ima.atualizar(delta, personagem, geradorCenario.getObjetosAtivos(), posicaoMapaX);
+                }
+
+                if (!poder.estaAtivo() && poder.getTempoPoder() <= 0) {
+                    listaPoderes.remove(i);
                 }
             }
         }
@@ -166,7 +215,7 @@ public class Jogo extends ApplicationAdapter {
         for (int i = explosoesAtivas.size() - 1; i >= 0; i--) {
             EfeitoExplosao exp = explosoesAtivas.get(i);
             exp.tempoDeVida += delta;
-            
+
             if (animacaoExplosao.isAnimationFinished(exp.tempoDeVida)) {
                 explosoesAtivas.remove(i);
             }
@@ -177,7 +226,7 @@ public class Jogo extends ApplicationAdapter {
         TipoBioma biomaAtivo = geradorCenario.getBiomaSobOJogador(posicaoMapaX);
         geradorFundo.renderizar(batch, biomaAtivo);
         geradorCenario.renderizar(batch, posicaoMapaX);
-
+        
         for (EfeitoExplosao exp : explosoesAtivas) {
             TextureRegion frameAtual = animacaoExplosao.getKeyFrame(exp.tempoDeVida);
             batch.draw(frameAtual, exp.x, exp.y, 32f, 32f);
@@ -188,26 +237,69 @@ public class Jogo extends ApplicationAdapter {
         int moedas = personagem.getMoeda();
         int granadas = personagem.getQtdGranadas();
 
-        font.draw(batch, "Distancia: " + distancia + "m", 10, Gdx.graphics.getHeight() - 10);
-        font.draw(batch, "Vida: " + vida, 10, Gdx.graphics.getHeight() - 30);
-        font.draw(batch, "Moedas: " + moedas, 10, Gdx.graphics.getHeight() - 50);
-        
-        batch.draw(assets.texRegGranada, 10, Gdx.graphics.getHeight() - 95, 24, 24);
-        font.draw(batch, "x" + granadas, 40, Gdx.graphics.getHeight() - 78);
+        float hudTop = Gdx.graphics.getHeight();
 
+        font.draw(batch, "Distancia: " + distancia + "m", 10, hudTop - 10);
 
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        
+        batch.draw(assets.texRegVida, 10, hudTop - 50, 24, 24);
+        font.draw(batch, "x" + vida, 38, hudTop - 30);
+
+        batch.draw(assets.texRegMoeda, 90, hudTop - 50, 24, 24);
+        font.draw(batch, "x" + moedas, 118, hudTop - 30);
+
+        batch.draw(assets.texRegGranada, 10, hudTop - 95, 24, 24);
+        font.draw(batch, "x" + granadas, 40, hudTop - 78);
+
+        // Render principal com SpriteBatch
         if (personagem.getVida() > 0) {
             personagem.renderizar(batch);
         }
 
-        for (Inimigo inimigo : listaInimigos) {
-            inimigo.renderizar(shapeRenderer); 
+            for (Inimigo inimigo : listaInimigos) {
+                if (inimigo instanceof Esqueleto esqueleto) {
+                    esqueleto.renderizar(batch);
+                } else if (inimigo instanceof Goblin goblin) {
+                    goblin.renderizar(batch);
+                } else if (inimigo instanceof Corvo corvo) {
+                    corvo.renderizar(batch);
+                }
+            }
+
+        // Renderiza os itens dos poderes no mapa (antes de serem coletados)
+        for (Poder poder : listaPoderes) {
+            if (poder instanceof Escudo escudo) {
+                float xTela = escudo.getAreaItem().x - posicaoMapaX + 100f;
+                float yTela = escudo.getAreaItem().y;
+                if (!escudo.estaAtivo()) {
+                    escudo.renderizarItem(batch, xTela, yTela);
+                }
+            } else if (poder instanceof Ima ima) {
+                float xTela = ima.getAreaItem().x - posicaoMapaX + 100f;
+                float yTela = ima.getAreaItem().y;
+                if (!ima.estaAtivo()) {
+                    ima.renderizarItem(batch, xTela, yTela);
+                }
+            }
         }
-        
+
+        // Renderiza os ícones dos poderes na HUD (quando ativos)
+        for (Poder poder : listaPoderes) {
+            if (poder instanceof Escudo escudo) {
+                escudo.renderizar(batch, 10f, Gdx.graphics.getHeight() - 125f, 48f, 48f);
+            } else if (poder instanceof Ima ima) {
+                ima.renderizar(batch, 50f, Gdx.graphics.getHeight() - 125f, 48f, 48f);
+            }
+        }
+
         batch.end();
+        batch.end();
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        for (Inimigo inimigo : listaInimigos) {
+            inimigo.renderizar(shapeRenderer);
+        }
         shapeRenderer.end();
+
         fimJogo();
     }
 
@@ -224,7 +316,7 @@ public class Jogo extends ApplicationAdapter {
                 } else {
                     personagem.tomarDano(inimigo.getDano());
                 }
-                
+
                 listaInimigos.remove(i);
             }
         }
@@ -233,38 +325,38 @@ public class Jogo extends ApplicationAdapter {
     private void verificarColisaoObstaculos() {
         Rectangle colisaoJogador = personagem.getColisao();
         Missil missilAtualNaTela = null;
-        
+
         for (int i = geradorCenario.getObjetosAtivos().size - 1; i >= 0; i--) {
             ObjetoDeJogo obj = geradorCenario.getObjetosAtivos().get(i);
-            
+
             if (obj instanceof Missil) {
                 Missil missil = (Missil) obj;
                 missilAtualNaTela = missil; // Registra que existe um míssil ativo
-                
+
                 float xMissilTela = missil.getPosicao().x - posicaoMapaX + 100f;
                 float yMissilTela = missil.getPosicao().y;
 
                 Rectangle areaMissilTela = new Rectangle(xMissilTela, yMissilTela, 32f, 32f);
-                
+
                 if (colisaoJogador.overlaps(areaMissilTela)) {
                     // Toca o som de explosão ao colidir com o míssil!
                     assets.somMissilExplosao.play(0.33f);
 
                     if (personagem.temEscudo()) {
-                        personagem.desativarEscudo(); 
+                        personagem.desativarEscudo();
                     } else {
-                        personagem.tomarDano(personagem.getVida()); 
+                        personagem.tomarDano(personagem.getVida());
                     }
-                    
+
                     if (missil instanceof Explodivel) {
-                        explosoesAtivas.add(new EfeitoExplosao(xMissilTela, yMissilTela));                    
+                        explosoesAtivas.add(new EfeitoExplosao(xMissilTela, yMissilTela));
                     }
-                    
-                    geradorCenario.getObjetosAtivos().removeIndex(i); 
+
+                    geradorCenario.getObjetosAtivos().removeIndex(i);
                     if (ultimoMissilAvistado == missil) {
-                        ultimoMissilAvistado = null; 
+                        ultimoMissilAvistado = null;
                     }
-                    break; 
+                    break;
                 }
             }
         }
@@ -272,7 +364,7 @@ public class Jogo extends ApplicationAdapter {
         if (missilAtualNaTela != null) {
             if (missilAtualNaTela != ultimoMissilAvistado) {
                 assets.somMissilVoando.play(0.15f);
-                ultimoMissilAvistado = missilAtualNaTela; 
+                ultimoMissilAvistado = missilAtualNaTela;
             }
         } else {
             ultimoMissilAvistado = null;
@@ -308,18 +400,36 @@ public class Jogo extends ApplicationAdapter {
         }
     }
 
+    public void spawnPoder() {
+        float xInicial = posicaoMapaX + 250f;
+        float ySpawn = MathUtils.random(50f, alturaMundo - 150f);
+
+        if (MathUtils.randomBoolean()) {
+            Escudo escudo = new Escudo(assets.texEscudo);
+            escudo.getAreaItem().set(xInicial, ySpawn, 32f, 32f);
+            listaPoderes.add(escudo);
+        } else {
+            Ima ima = new Ima(assets.texIma);
+            ima.getAreaItem().set(xInicial, ySpawn, 32f, 32f);
+            listaPoderes.add(ima);
+        }
+    }
+
     public void spawnInimigo() {
         float xInicial = larguraMundo + 50f;
-        float yAleatorio = MathUtils.random(50f, alturaMundo - 100f);
+        int tipoInimigo = MathUtils.random(0, 2);
+        float inimigoLargura = 80f;
+        float inimigoAltura = 80f;
 
-        int tipoInimigo = MathUtils.random(0, 1);
-
-        if (tipoInimigo == 0) {
-            listaInimigos.add(new Esqueleto(xInicial, yAleatorio, 40f, 40f, assets.somDano));
-        } else {
-            listaInimigos.add(new Corvo(xInicial, yAleatorio, 40f, 40f, assets.somDano));
+        if (tipoInimigo == 0) { // Esqueleto (chão)
+            listaInimigos.add(new Esqueleto(xInicial, 32f, inimigoLargura, inimigoAltura, assets.somDano, assets));
+        } else if (tipoInimigo == 1) { // Goblin (chão)
+            listaInimigos.add(new Goblin(xInicial, 32f, inimigoLargura, inimigoAltura, assets.somDano, assets));
+        } else { // Corvo (voador)
+            float yAleatorio = MathUtils.random(alturaMundo / 3f, alturaMundo - 120f);
+            listaInimigos.add(new Corvo(xInicial, yAleatorio, inimigoLargura, inimigoAltura, assets.somDano, assets));
         }
-    } 
+    }
 
     public void fimJogo() {
         if (personagem.deveExplodir(personagem.getColisao().x, personagem.getColisao().y)) {
@@ -340,8 +450,8 @@ public class Jogo extends ApplicationAdapter {
             }
 
             if (iniciouAnimacaoMorte && explosoesAtivas.isEmpty()) {
-                this.dispose(); 
-                game.setScreen(new MorteScreen(game, assets)); 
+                this.dispose();
+                game.setScreen(new MorteScreen(game, assets));
             }
         }
     }
@@ -349,7 +459,7 @@ public class Jogo extends ApplicationAdapter {
     @Override
     public void dispose() {
         batch.dispose();
-        shapeRenderer.dispose(); 
+        shapeRenderer.dispose();
         font.dispose();
     }
 }
