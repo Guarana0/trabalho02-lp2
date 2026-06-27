@@ -1,6 +1,7 @@
 package br.com.lgalarane.trabalho02;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -10,14 +11,16 @@ public class GameAssets {
     private AssetManager managerAsset;
 
     public Sound somDano;
-
+    public Sound somMissilVoando;
+    public Sound somMissilExplosao;
     public TextureRegion texRegConcreto;
     public TextureRegion texRegFogo;
     public TextureRegion texRegNeve;
     public TextureRegion texRegGrama;
-    public TextureRegion texRegMoeda;  
+    public TextureRegion texRegMoeda;
+    public TextureRegion texRegVida;
     public TextureRegion texRegGranada;
-    public TextureRegion texRegMissil; 
+    public TextureRegion texRegMissil;
 
     public TextureRegion texRegFundoGrama;
     public TextureRegion texRegFundoFogo;
@@ -43,6 +46,18 @@ public class GameAssets {
 
     public Array<TextureRegion> framesVoandoCorvo;
 
+
+    public Sound somPulo;
+    public Sound somTiro;
+    public Sound somPowerUp1;
+    public Sound somPowerUp2;
+    public Sound somPowerUp3;
+    public Sound somMoeda;
+
+    public Music musicaMenu;
+    public Music musica1;
+    public Music musica2;
+    public Music musicaMorte;
 
     public GameAssets() {
         this.managerAsset = new AssetManager();
@@ -86,14 +101,29 @@ public class GameAssets {
 
     public void carregaTodosAssets() {
         managerAsset.load("fontes/dano.wav", Sound.class);
+        managerAsset.load("fontes/missilvoando.mp3", Sound.class);
+        managerAsset.load("fontes/explosao.mp3", Sound.class);
+        managerAsset.load("fontes/pulo.wav", Sound.class);
+        managerAsset.load("fontes/tiro.mp3", Sound.class);
+        managerAsset.load("fontes/powerup1.mp3", Sound.class);
+        managerAsset.load("fontes/powerup2.mp3", Sound.class);
+        managerAsset.load("fontes/powerup3.mp3", Sound.class);
+
+        managerAsset.load("fontes/sommoeda.mp3", Sound.class);
+
+        managerAsset.load("fontes/musicamenu.mp3", Music.class);
+        managerAsset.load("fontes/musica1.mp3", Music.class);
+        managerAsset.load("fontes/musica2.mp3", Music.class);
+        managerAsset.load("fontes/menuMorte.mp3", Music.class);
 
         managerAsset.load("textures/concreto.png", Texture.class);
         managerAsset.load("textures/fogo.png", Texture.class);
         managerAsset.load("textures/neve.png", Texture.class);
         managerAsset.load("textures/grama.png", Texture.class);
         managerAsset.load("textures/moeda.png", Texture.class);
-        managerAsset.load("textures/granada.png", Texture.class); 
-        managerAsset.load("textures/missil.png", Texture.class); 
+        managerAsset.load("textures/vida.png", Texture.class);
+        managerAsset.load("textures/granada.png", Texture.class);
+        managerAsset.load("textures/missil.png", Texture.class);
 
         managerAsset.load("textures/gramafundo.png", Texture.class);
         managerAsset.load("textures/fogofundo.png", Texture.class);
@@ -116,15 +146,29 @@ public class GameAssets {
         managerAsset.finishLoading();
 
         somDano = managerAsset.get("fontes/dano.wav", Sound.class);
+        somMissilVoando = managerAsset.get("fontes/missilvoando.mp3", Sound.class);
+        somMissilExplosao = managerAsset.get("fontes/explosao.mp3", Sound.class);
+        somPulo = managerAsset.get("fontes/pulo.wav", Sound.class);
+        somTiro = managerAsset.get("fontes/tiro.mp3", Sound.class);
+        somPowerUp1 = managerAsset.get("fontes/powerup1.mp3", Sound.class);
+        somPowerUp2 = managerAsset.get("fontes/powerup2.mp3", Sound.class);
+        somPowerUp3 = managerAsset.get("fontes/powerup3.mp3", Sound.class);
+        somMoeda = managerAsset.get("fontes/sommoeda.mp3", Sound.class);
+
+        musicaMenu = managerAsset.get("fontes/musicamenu.mp3", Music.class);
+        musica1 = managerAsset.get("fontes/musica1.mp3", Music.class);
+        musica2 = managerAsset.get("fontes/musica2.mp3", Music.class);
+        musicaMorte = managerAsset.get("fontes/menuMorte.mp3", Music.class);
 
         texRegConcreto = new TextureRegion(managerAsset.get("textures/concreto.png", Texture.class));
         texRegFogo = new TextureRegion(managerAsset.get("textures/fogo.png", Texture.class));
         texRegNeve = new TextureRegion(managerAsset.get("textures/neve.png", Texture.class));
         texRegGrama = new TextureRegion(managerAsset.get("textures/grama.png", Texture.class));
-        
+
         texRegMoeda = new TextureRegion(managerAsset.get("textures/moeda.png", Texture.class));
+        texRegVida = new TextureRegion(managerAsset.get("textures/vida.png", Texture.class));
         texRegGranada = new TextureRegion(managerAsset.get("textures/granada.png", Texture.class));
-        
+
         texRegMissil = new TextureRegion(managerAsset.get("textures/missil.png", Texture.class));
 
         texRegFundoGrama = new TextureRegion(managerAsset.get("textures/gramafundo.png", Texture.class));
@@ -139,9 +183,10 @@ public class GameAssets {
         texCorvo = managerAsset.get("textures/corvoSprite.png", Texture.class);
 
         // tudo abaixo até a linha 100 foi utilizado IA
+
         int frameW = 426;
         int frameH = 1440;
-        
+
         framesCorrendo = new Array<>();
         framesCorrendo.add(new TextureRegion(texPersonagem, 0 * frameW, 0, frameW, frameH));
         framesCorrendo.add(new TextureRegion(texPersonagem, 1 * frameW, 0, frameW, frameH));
@@ -164,10 +209,9 @@ public class GameAssets {
         for (int i = 0; i < 24; i++) {
             String caminhoFrame = String.format("textures/explosao_frames/explosao_%02d.png", i);
             Texture tex = managerAsset.get(caminhoFrame, Texture.class);
-            
 
             tex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-            
+
             framesExplosao.add(new TextureRegion(tex));
         }
     }
