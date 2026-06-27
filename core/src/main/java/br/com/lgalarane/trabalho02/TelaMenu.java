@@ -20,9 +20,12 @@ public class TelaMenu extends ScreenAdapter {
     private BitmapFont fonteTitulo, fonteTexto;
     private GlyphLayout layout;
     private float tempo;
+    
+    private GameAssets assets; 
 
-    public TelaMenu(Game jogo) {
+    public TelaMenu(Game jogo, GameAssets assets) {
         this.jogo = jogo;
+        this.assets = assets;
     }
 
     @Override
@@ -35,6 +38,13 @@ public class TelaMenu extends ScreenAdapter {
         fonteTitulo.getData().setScale(3.0f);
         fonteTexto = new BitmapFont();
         fonteTexto.getData().setScale(1.2f);
+
+        assets = new GameAssets();
+        assets.carregaTodosAssets();
+
+        assets.musicaMenu.setLooping(true);
+        assets.musicaMenu.setVolume(0.5f);
+        assets.musicaMenu.play();
     }
 
     @Override
@@ -43,33 +53,32 @@ public class TelaMenu extends ScreenAdapter {
         ScreenUtils.clear(0.05f, 0.05f, 0.1f, 1f);
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER) || Gdx.input.justTouched()) {
-            jogo.setScreen(new JogoScreen(jogo));
+            assets.musicaMenu.stop();
+            
+            jogo.setScreen(new JogoScreen(jogo)); 
             return;
         }
 
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
 
-        // DEGRADE DO FUNDO
         forma.begin(ShapeType.Filled);
         forma.rect(0, 0, w, h, new Color(0.05f, 0.05f, 0.15f, 1), new Color(0.05f, 0.05f, 0.15f, 1),
                 new Color(0.1f, 0.1f, 0.25f, 1), new Color(0.1f, 0.1f, 0.25f, 1));
 
-        // 2. Painel Central Estilizado
         float pW = w * 0.6f, pH = 200f;
         float pX = (w - pW) / 2f, pY = (h - pH) / 2f;
 
         forma.setColor(0.1f, 0.15f, 0.3f, 0.8f);
-        forma.rect(pX, pY, pW, pH); // Fundo do painel
+        forma.rect(pX, pY, pW, pH);
         forma.setColor(0.2f, 0.4f, 0.6f, 0.3f);
-        forma.rect(pX, pY + pH - 5, pW, 5); // Borda superior
+        forma.rect(pX, pY + pH - 5, pW, 5); 
         forma.end();
 
         lote.begin();
         String titulo = "MENU PRINCIPAL";
-        String instrucao = "CÇIQUE OU PRESSIONE ENTER PARA INICIAR";
+        String instrucao = "CLIQUE OU PRESSIONE ENTER PARA INICIAR";
 
-        // Efeito de brilho na instrução
         float alpha = 0.5f + 0.5f * MathUtils.sin(tempo * 3f);
 
         desenharTextoSombreado(titulo, fonteTitulo, h * 0.6f, Color.WHITE, Color.BLACK);
@@ -82,9 +91,9 @@ public class TelaMenu extends ScreenAdapter {
         layout.setText(fonte, texto);
         float x = (Gdx.graphics.getWidth() - layout.width) / 2f;
         fonte.setColor(sombra);
-        fonte.draw(lote, texto, x + 2, y - 2); // Sombra
+        fonte.draw(lote, texto, x + 2, y - 2); 
         fonte.setColor(cor);
-        fonte.draw(lote, texto, x, y); // Texto principal
+        fonte.draw(lote, texto, x, y); 
     }
 
     @Override
@@ -93,5 +102,7 @@ public class TelaMenu extends ScreenAdapter {
         forma.dispose();
         fonteTitulo.dispose();
         fonteTexto.dispose();
+        
+        assets.limparAssets(); 
     }
 }
