@@ -15,6 +15,7 @@ import mapa.obstaculos.Explodivel;
 public class PersonagemPrincipal extends Personagem implements Explodivel{
     private boolean apertouEsp;
     private boolean protegidoPorEscudo;
+    private boolean imaAtivo;
 
     private int moeda = 0;
     private int qtdGranadas = 5;
@@ -57,6 +58,14 @@ public class PersonagemPrincipal extends Personagem implements Explodivel{
 
     public void setProtegidoPorEscudo(boolean protegidoPorEscudo) {
         this.protegidoPorEscudo = protegidoPorEscudo;
+    }
+
+    public boolean isImaAtivo() {
+        return imaAtivo;
+    }
+
+    public void setImaAtivo(boolean imaAtivo) {
+        this.imaAtivo = imaAtivo;
     }
 
     public float getDistanciaPercorrida() {
