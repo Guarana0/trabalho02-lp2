@@ -24,6 +24,9 @@ public class GameAssets {
     public TextureRegion texRegFundoNeve;
     public TextureRegion texRegFundoConcreto;
 
+    public TextureRegion texEscudo;
+    public TextureRegion texIma;
+
     public Array<TextureRegion> framesExplosao;
 
     public Texture texPersonagem;
@@ -94,6 +97,8 @@ public class GameAssets {
         managerAsset.load("textures/moeda.png", Texture.class);
         managerAsset.load("textures/granada.png", Texture.class); 
         managerAsset.load("textures/missil.png", Texture.class); 
+        managerAsset.load("textures/escudo.png", Texture.class); 
+        managerAsset.load("textures/ima.png", Texture.class); 
 
         managerAsset.load("textures/gramafundo.png", Texture.class);
         managerAsset.load("textures/fogofundo.png", Texture.class);
@@ -126,6 +131,9 @@ public class GameAssets {
         texRegGranada = new TextureRegion(managerAsset.get("textures/granada.png", Texture.class));
         
         texRegMissil = new TextureRegion(managerAsset.get("textures/missil.png", Texture.class));
+
+        texEscudo = new TextureRegion(managerAsset.get("textures/escudo.png", Texture.class));
+        texIma = new TextureRegion(managerAsset.get("textures/ima.png", Texture.class));
 
         texRegFundoGrama = new TextureRegion(managerAsset.get("textures/gramafundo.png", Texture.class));
         texRegFundoFogo = new TextureRegion(managerAsset.get("textures/fogofundo.png", Texture.class));

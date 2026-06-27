@@ -105,7 +105,7 @@ public class Jogo extends ApplicationAdapter {
             assets.texRegFundoConcreto
         );
 
-        personagem = new PersonagemPrincipal(0f, 100f, 130f, 170f, assets.somDano, assets);
+        personagem = new PersonagemPrincipal(0f, 100f, 100f, 130f, assets.somDano, assets);
         areaMoeda = new Rectangle();
     }
 

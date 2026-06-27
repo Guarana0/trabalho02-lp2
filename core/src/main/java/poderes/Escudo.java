@@ -1,15 +1,24 @@
 package poderes;
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import personagem.PersonagemPrincipal;
 
 public class Escudo extends Poder {
     private Rectangle tamanhoEscudo;
+    private final TextureRegion textura;
 
     public Escudo() {
+        this(null);
         this.estaAtivo = false;
 
         // criar funcao que define onde o item do escudo vai nascer no mapa e seu tamanho
+    }
+
+    public Escudo(TextureRegion textura) {
+        this.textura = textura;
+        this.estaAtivo = false;
     }
 
     public void atualizar(float deltaTempo, PersonagemPrincipal personagem) {
@@ -44,5 +53,11 @@ public class Escudo extends Poder {
 
     public Rectangle getTamanhoEscudo() {
         return tamanhoEscudo;
+    }
+
+    public void renderizar(SpriteBatch batch, float x, float y) {
+        if (estaAtivo && textura != null) {
+            batch.draw(textura, x, y, 32f, 32f);
+        }
     }
 }
