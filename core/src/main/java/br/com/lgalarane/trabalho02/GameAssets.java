@@ -52,13 +52,12 @@ public class GameAssets {
     public Sound somPulo;
     public Sound somTiro;
     public Sound somMoeda;
+    public Sound somPoder;
 
     public Music musicaMenu;
     public Music musica1;
     public Music musica2;
     public Music musicaMorte;
-    public Music musicaEscudo;
-    public Music musicaIma;
 
     public GameAssets() {
         this.managerAsset = new AssetManager();
@@ -107,13 +106,12 @@ public class GameAssets {
         managerAsset.load("fontes/pulo.wav", Sound.class);
         managerAsset.load("fontes/tiro.mp3", Sound.class);
         managerAsset.load("fontes/sommoeda.mp3", Sound.class);
+        managerAsset.load("fontes/somPoder.wav", Sound.class);
 
         managerAsset.load("fontes/musicamenu.mp3", Music.class);
         managerAsset.load("fontes/musica1.mp3", Music.class);
         managerAsset.load("fontes/musica2.mp3", Music.class);
         managerAsset.load("fontes/menuMorte.mp3", Music.class);
-        managerAsset.load("fontes/imaMusica.mp3", Music.class);
-        managerAsset.load("fontes/escudoMusica.mp3", Music.class);
 
         managerAsset.load("textures/concreto.png", Texture.class);
         managerAsset.load("textures/fogo.png", Texture.class);
@@ -152,14 +150,12 @@ public class GameAssets {
         somPulo = managerAsset.get("fontes/pulo.wav", Sound.class);
         somTiro = managerAsset.get("fontes/tiro.mp3", Sound.class);
         somMoeda = managerAsset.get("fontes/sommoeda.mp3", Sound.class);
+        somPoder = managerAsset.get("fontes/somPoder.wav", Sound.class);
 
         musicaMenu = managerAsset.get("fontes/musicamenu.mp3", Music.class);
         musica1 = managerAsset.get("fontes/musica1.mp3", Music.class);
         musica2 = managerAsset.get("fontes/musica2.mp3", Music.class);
         musicaMorte = managerAsset.get("fontes/menuMorte.mp3", Music.class);
-        musicaEscudo = managerAsset.get("fontes/escudoMusica.mp3", Music.class);
-        musicaIma = managerAsset.get("fontes/imaMusica.mp3", Music.class);
-
 
         texRegConcreto = new TextureRegion(managerAsset.get("textures/concreto.png", Texture.class));
         texRegFogo = new TextureRegion(managerAsset.get("textures/fogo.png", Texture.class));
