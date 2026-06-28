@@ -1,7 +1,5 @@
 package personagem;
 
-import br.com.lgalarane.trabalho02.GameAssets;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
@@ -10,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 
+import br.com.lgalarane.trabalho02.GameAssets;
 import mapa.obstaculos.Explodivel;
 
 public class PersonagemPrincipal extends Personagem implements Explodivel{
@@ -18,7 +17,7 @@ public class PersonagemPrincipal extends Personagem implements Explodivel{
     private boolean imaAtivo;
 
     private int moeda = 0;
-    private int qtdGranadas = 5;
+    private int qtdTiros = 20;
 
     private final float GRAVIDADE = -2200f;
     private final float FORCA_JETPACK = 1800f;
@@ -147,13 +146,13 @@ public class PersonagemPrincipal extends Personagem implements Explodivel{
         return vida;
     }
 
-    // granadas
-    public int getQtdGranadas() {
-        return qtdGranadas;
+    // tiros
+    public int getQtdTiros() {
+        return qtdTiros;
     }
 
-    public void setQtdGranadas(int qtdGranadas) {
-        this.qtdGranadas = qtdGranadas;
+    public void setQtdTiros(int qtdTiros) {
+        this.qtdTiros = qtdTiros;
     }
 
     public boolean morte() {

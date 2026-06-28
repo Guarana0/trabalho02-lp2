@@ -21,18 +21,19 @@ import mapa.TipoBioma;
 import mapa.obstaculos.Explodivel;
 import mapa.obstaculos.Missil;
 import mapa.obstaculos.Obstaculo;
+import mapa.obstaculos.Zapper;
 import mapa.planosdefundo.GeradorFundo;
 import mapa.tiles.MoedaTile;
 import objetos.ObjetoDeJogo;
+import objetos.Projetil;
+import personagem.Inimigo;
+import personagem.Inimigos.Corvo;
+import personagem.Inimigos.Esqueleto;
+import personagem.Inimigos.Goblin;
+import personagem.PersonagemPrincipal;
 import poderes.Escudo;
 import poderes.Ima;
 import poderes.Poder;
-import personagem.Inimigo;
-import personagem.Inimigos.Esqueleto;
-import personagem.Inimigos.Goblin;
-import personagem.Inimigos.Corvo;
-
-import personagem.PersonagemPrincipal;
 
 public class Jogo extends ApplicationAdapter {
     private final Game game;
@@ -47,6 +48,7 @@ public class Jogo extends ApplicationAdapter {
 
     private ArrayList<Inimigo> listaInimigos;
     private ArrayList<Poder> listaPoderes;
+    private ArrayList<Projetil> listaProjeteis;
     private Rectangle areaMoeda;
 
     private float posicaoMapaX = 0f;
@@ -81,6 +83,12 @@ public class Jogo extends ApplicationAdapter {
 
     private Missil ultimoMissilAvistado = null;
 
+    private int abatesTotais = 0;
+
+    private Music musicaPrincipalAtual = null;
+    private boolean musicaPoderTocando = false;
+    private boolean musicaInicialSorteada = false;
+
     private static class EfeitoExplosao {
         float x, y;
         float tempoDeVida = 0f;
@@ -102,6 +110,7 @@ public class Jogo extends ApplicationAdapter {
 
         listaInimigos = new ArrayList<>();
         listaPoderes = new ArrayList<>();
+        listaProjeteis = new ArrayList<>();
 
         assets = new GameAssets();
         assets.carregaTodosAssets();
@@ -133,37 +142,39 @@ public class Jogo extends ApplicationAdapter {
         assets.musica1.setVolume(1.2f);
         assets.musica2.setVolume(1.2f);
 
-        // quando a 1 terminar, começará a 2
         assets.musica1.setOnCompletionListener(new Music.OnCompletionListener() {
             @Override
             public void onCompletion(Music music) {
+                musicaPrincipalAtual = assets.musica2;
                 assets.musica2.play();
             }
         });
 
-        // quando a 2 terminar, começará a 1 de novo
         assets.musica2.setOnCompletionListener(new Music.OnCompletionListener() {
             @Override
             public void onCompletion(Music music) {
+                musicaPrincipalAtual = assets.musica1;
                 assets.musica1.play();
             }
         });
 
-        assets.musica1.play();
+        if (MathUtils.randomBoolean(0.5f)) {
+            musicaPrincipalAtual = assets.musica1;
+        } else {
+            musicaPrincipalAtual = assets.musica2;
+        }
+
+        musicaPrincipalAtual.play();
     }
 
     @Override
-    public void render() {
+    public void render() { // Garanta que o método recebe 'delta' como parâmetro do Screen
         float delta = Gdx.graphics.getDeltaTime();
-
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
-
         if (personagem.getVida() > 0) {
             tempoTotal += delta;
-
-            // Velocidade aumenta com o tempo (progressão simples)
+            sortearMusicaInicial();
             velocidadeMapaAtual = getVelocidadeAtual();
-
             personagem.atualizar(delta, velocidadeMapaAtual);
             posicaoMapaX += velocidadeMapaAtual * delta;
 
@@ -171,78 +182,29 @@ public class Jogo extends ApplicationAdapter {
             verificarColetaMoedas();
             verificarColisaoObstaculos();
             verificarColisaoInimigos();
-            verificarInputGranada();
-
+            verificarInputTiro();
+            verificarColisaoTiros();
+            iniciaListaDeProjeteis(delta);
             tempoDesdeUltimoInimigo += delta;
             if (tempoDesdeUltimoInimigo >= getTempoSpawnInimigo()) {
                 spawnInimigo();
                 tempoDesdeUltimoInimigo = 0f;
             }
-
-            for (int i = listaInimigos.size() - 1; i >= 0; i--) {
-                Inimigo inimigo = listaInimigos.get(i);
-                inimigo.update(delta);
-
-                if (!inimigo.getAtivo()) {
-                    listaInimigos.remove(i);
-                }
-            }
-
-            tempoDesdeUltimoPoder += delta;
-            if (tempoDesdeUltimoPoder >= TEMPO_SPAWN_PODER) {
-                spawnPoder();
-                tempoDesdeUltimoPoder = 0f;
-            }
-
-            for (int i = listaPoderes.size() - 1; i >= 0; i--) {
-                Poder poder = listaPoderes.get(i);
-                if (poder instanceof Escudo escudo) {
-                    // Verifica colisão convertendo coordenadas do mundo para tela
-                    Rectangle areaItemTela = new Rectangle();
-                    areaItemTela.set(escudo.getAreaItem());
-                    areaItemTela.setPosition(
-                            escudo.getAreaItem().x - posicaoMapaX + 100f,
-                            escudo.getAreaItem().y);
-
-                    if (!escudo.estaAtivo() && personagem.getColisao().overlaps(areaItemTela)) {
-                        escudo.setEstaAtivo(true);
-                        escudo.getAreaItem().set(0, 0, 0, 0);
-                    }
-                    escudo.atualizar(delta, personagem);
-                } else if (poder instanceof Ima ima) {
-                    // Verifica colisão convertendo coordenadas do mundo para tela
-                    Rectangle areaItemTela = new Rectangle();
-                    areaItemTela.set(ima.getAreaItem());
-                    areaItemTela.setPosition(
-                            ima.getAreaItem().x - posicaoMapaX + 100f,
-                            ima.getAreaItem().y);
-
-                    if (!ima.estaAtivo() && personagem.getColisao().overlaps(areaItemTela)) {
-                        ima.setEstaAtivo(true);
-                        ima.getAreaItem().set(0, 0, 0, 0);
-                    }
-                    ima.atualizar(delta, personagem, geradorCenario.getObjetosAtivos(), posicaoMapaX);
-                }
-
-                if (!poder.estaAtivo() && poder.getTempoPoder() <= 0) {
-                    listaPoderes.remove(i);
-                }
-            }
+            iniciaListaDeInimigos(delta);
+            ajustaPoderes(delta);
+            verificaMusicas(delta); 
         }
-
         for (int i = explosoesAtivas.size() - 1; i >= 0; i--) {
             EfeitoExplosao exp = explosoesAtivas.get(i);
             exp.tempoDeVida += delta;
-
             if (animacaoExplosao.isAnimationFinished(exp.tempoDeVida)) {
                 explosoesAtivas.remove(i);
             }
         }
-
         batch.begin();
 
-        TipoBioma biomaAtivo = geradorCenario.getBiomaSobOJogador(posicaoMapaX);
-        geradorFundo.renderizar(batch, biomaAtivo);
+        TipoBioma biomaParaDesenho = geradorCenario.getBiomaSobOJogador(posicaoMapaX);
+        geradorFundo.renderizar(batch, biomaParaDesenho);
         geradorCenario.renderizar(batch, posicaoMapaX);
 
         for (EfeitoExplosao exp : explosoesAtivas) {
@@ -250,24 +212,91 @@ public class Jogo extends ApplicationAdapter {
             batch.draw(frameAtual, exp.x, exp.y, 32f, 32f);
         }
 
-        int distancia = (int) personagem.getDistanciaPercorrida();
-        int vida = personagem.getVida();
-        int moedas = personagem.getMoeda();
-        int granadas = personagem.getQtdGranadas();
+        for (Projetil proj : listaProjeteis) {
+            proj.renderizar(batch);
+        }
 
-        float hudTop = Gdx.graphics.getHeight();
+        renderizaObjetos();
+        renderizaPoderes(delta);
+        renderizaHUD();
 
-        font.draw(batch, "Distancia: " + distancia + "m", 10, hudTop - 10);
+        batch.end();
 
-        batch.draw(assets.texRegVida, 10, hudTop - 50, 24, 24);
-        font.draw(batch, "x" + vida, 40, hudTop - 33);
+        fimJogo(); 
+    }
 
-        batch.draw(assets.texRegMoeda, 10, hudTop - 85, 24, 24);
-        font.draw(batch, "x" + moedas, 40, hudTop - 68);
+    private void sortearMusicaInicial(){
+        if (!musicaInicialSorteada) {
+            if (MathUtils.randomBoolean()) {
+                tocarMusicaPrincipal(assets.musica1);
+            } else {
+                tocarMusicaPrincipal(assets.musica2);
+            }
+            musicaInicialSorteada = true;
+        }
+    }
 
-        batch.draw(assets.texRegGranada, 10, hudTop - 120, 24, 24);
-        font.draw(batch, "x" + granadas, 40, hudTop - 103);
+    public void tocarMusicaPrincipal(Music novaMusica) {
+        if (musicaPrincipalAtual == novaMusica && novaMusica.isPlaying()) {
+            return; 
+        }
 
+        if (musicaPrincipalAtual != null) {
+            musicaPrincipalAtual.stop();
+        }
+
+        musicaPrincipalAtual = novaMusica;
+        musicaPrincipalAtual.setLooping(true);
+        musicaPrincipalAtual.setVolume(0.4f);
+        musicaPrincipalAtual.play();
+    }
+
+    private void ajustaPoderes(float delta){
+        tempoDesdeUltimoPoder += delta;
+        if (tempoDesdeUltimoPoder >= TEMPO_SPAWN_PODER) {
+            spawnPoder();
+            tempoDesdeUltimoPoder = 0f;
+        }
+
+        for (int i = listaPoderes.size() - 1; i >= 0; i--) {
+            Poder poder = listaPoderes.get(i);
+            if (poder instanceof Escudo escudo) {
+                // Verifica colisão convertendo coordenadas do mundo para tela
+                Rectangle areaItemTela = new Rectangle();
+                areaItemTela.set(escudo.getAreaItem());
+                areaItemTela.setPosition(
+                        escudo.getAreaItem().x - posicaoMapaX + 100f,
+                        escudo.getAreaItem().y);
+
+                if (!escudo.estaAtivo() && personagem.getColisao().overlaps(areaItemTela)) {
+                    escudo.setEstaAtivo(true);
+                    escudo.getAreaItem().set(0, 0, 0, 0);
+                    //da mais tiros
+                    personagem.setQtdTiros(personagem.getQtdTiros() + 5);
+                }
+                escudo.atualizar(delta, personagem);
+            } else if (poder instanceof Ima ima) {
+                // Verifica colisão convertendo coordenadas do mundo para tela
+                Rectangle areaItemTela = new Rectangle();
+                areaItemTela.set(ima.getAreaItem());
+                areaItemTela.setPosition(
+                        ima.getAreaItem().x - posicaoMapaX + 100f,
+                        ima.getAreaItem().y);
+
+                if (!ima.estaAtivo() && personagem.getColisao().overlaps(areaItemTela)) {
+                    ima.setEstaAtivo(true);
+                    ima.getAreaItem().set(0, 0, 0, 0);
+                }
+                ima.atualizar(delta, personagem, geradorCenario.getObjetosAtivos(), posicaoMapaX);
+            }
+
+            if (!poder.estaAtivo() && poder.getTempoPoder() <= 0) {
+                listaPoderes.remove(i);
+            }
+        }
+    }
+
+    private void renderizaObjetos(){
         if (personagem.getVida() > 0) {
             personagem.renderizar(batch);
         }
@@ -302,17 +331,176 @@ public class Jogo extends ApplicationAdapter {
 
         // Renderiza os ícones dos poderes na HUD (quando ativos)
         for (Poder poder : listaPoderes) {
-            if (poder instanceof Escudo escudo) {
-                escudo.renderizar(batch, 10f, Gdx.graphics.getHeight() - 125f, 48f, 48f);
-            } else if (poder instanceof Ima ima) {
-                ima.renderizar(batch, 50f, Gdx.graphics.getHeight() - 125f, 48f, 48f);
+            if (poder instanceof Escudo escudo && escudo.estaAtivo()) {
+                escudo.renderizar(batch, 10f, 20f, 48f, 48f);
+            } else if (poder instanceof Ima ima && ima.estaAtivo()) {
+                ima.renderizar(batch, 65f, 20f, 48f, 48f);
             }
         }
-
-        batch.end();
-
-        fimJogo();
     }
+
+    private void iniciaListaDeInimigos(float delta){
+        for (int i = listaInimigos.size() - 1; i >= 0; i--) {
+            Inimigo inimigo = listaInimigos.get(i);
+            inimigo.update(delta);
+
+            if (!inimigo.getAtivo()) {
+                listaInimigos.remove(i);
+            }
+        }
+    }
+
+    private void iniciaListaDeProjeteis(float delta){
+        for (int i = listaProjeteis.size() - 1; i >= 0; i--) {
+            Projetil proj = listaProjeteis.get(i);
+                
+            proj.atualizar(delta, velocidadeMapaAtual);
+            if (proj.getPosicao().x > larguraMundo) {
+                proj.setAtivo(false);
+            }
+
+            if (!proj.isAtivo()) {
+                listaProjeteis.remove(i);
+            }
+        }
+    }
+
+    private void renderizaPoderes(float delta){
+        tempoDesdeUltimoPoder += delta;
+        if (tempoDesdeUltimoPoder >= TEMPO_SPAWN_PODER) {
+            spawnPoder();
+            tempoDesdeUltimoPoder = 0f;
+        }
+
+        for (int i = listaPoderes.size() - 1; i >= 0; i--) {
+            Poder poder = listaPoderes.get(i);
+            if (poder instanceof Escudo escudo) {
+                // Verifica colisão convertendo coordenadas do mundo para tela
+                Rectangle areaItemTela = new Rectangle();
+                areaItemTela.set(escudo.getAreaItem());
+                areaItemTela.setPosition(
+                        escudo.getAreaItem().x - posicaoMapaX + 100f,
+                        escudo.getAreaItem().y);
+
+                if (!escudo.estaAtivo() && personagem.getColisao().overlaps(areaItemTela)) {
+                    escudo.setEstaAtivo(true);
+                    escudo.getAreaItem().set(0, 0, 0, 0);
+                    //da mais tiros
+                    personagem.setQtdTiros(personagem.getQtdTiros() + 5);
+                }
+                escudo.atualizar(delta, personagem);
+            } else if (poder instanceof Ima ima) {
+                // Verifica colisão convertendo coordenadas do mundo para tela
+                Rectangle areaItemTela = new Rectangle();
+                areaItemTela.set(ima.getAreaItem());
+                areaItemTela.setPosition(
+                        ima.getAreaItem().x - posicaoMapaX + 100f,
+                        ima.getAreaItem().y);
+
+                if (!ima.estaAtivo() && personagem.getColisao().overlaps(areaItemTela)) {
+                    ima.setEstaAtivo(true);
+                    ima.getAreaItem().set(0, 0, 0, 0);
+                }
+                ima.atualizar(delta, personagem, geradorCenario.getObjetosAtivos(), posicaoMapaX);
+            }
+
+             if (!poder.estaAtivo() && poder.getTempoPoder() <= 0) {
+                listaPoderes.remove(i);
+            }
+        }
+    }
+    
+
+    private void renderizaHUD(){
+        int distancia = (int) personagem.getDistanciaPercorrida();
+        int vida = personagem.getVida();
+        int moedas = personagem.getMoeda();
+        int tiros = personagem.getQtdTiros();
+
+        float hudTop = Gdx.graphics.getHeight();
+
+        font.draw(batch, "Distancia: " + distancia + "m", 10, hudTop - 10);
+
+        batch.draw(assets.texRegVida, 10, hudTop - 50, 24, 24);
+        font.draw(batch, "x" + vida, 40, hudTop - 33);
+
+        batch.draw(assets.texRegMoeda, 10, hudTop - 85, 24, 24);
+        font.draw(batch, "x" + moedas, 40, hudTop - 68);
+
+        batch.draw(assets.texRegTiro, 10, hudTop - 120, 24, 24);
+        font.draw(batch, "x" + tiros + " - Aperte G para atirar!", 40, hudTop - 103);
+
+        font.draw(batch, "Abates: " + abatesTotais, 10, hudTop - 145);
+    }
+
+    private void verificaMusicas(float delta) {
+        boolean temEscudoAtivo = false;
+        boolean temImaAtivo = false;
+
+        for (int i = listaPoderes.size() - 1; i >= 0; i--) {
+            Poder poder = listaPoderes.get(i);
+            
+            if (poder instanceof Escudo escudo) {
+                Rectangle areaItemTela = new Rectangle(escudo.getAreaItem());
+                areaItemTela.setPosition(escudo.getAreaItem().x - posicaoMapaX + 100f, escudo.getAreaItem().y);
+
+                if (!escudo.estaAtivo() && personagem.getColisao().overlaps(areaItemTela)) {
+                    escudo.setEstaAtivo(true);
+                    escudo.getAreaItem().set(0, 0, 0, 0);
+                }
+                
+                escudo.atualizar(delta, personagem);
+                if (escudo.estaAtivo()) temEscudoAtivo = true;
+
+            } else if (poder instanceof Ima ima) {
+                Rectangle areaItemTela = new Rectangle(ima.getAreaItem());
+                areaItemTela.setPosition(ima.getAreaItem().x - posicaoMapaX + 100f, ima.getAreaItem().y);
+
+                if (!ima.estaAtivo() && personagem.getColisao().overlaps(areaItemTela)) {
+                    ima.setEstaAtivo(true);
+                    ima.getAreaItem().set(0, 0, 0, 0);
+                }
+                
+                ima.atualizar(delta, personagem, geradorCenario.getObjetosAtivos(), posicaoMapaX);
+                if (ima.estaAtivo()) temImaAtivo = true;
+            }
+
+            if (!poder.estaAtivo() && poder.getTempoPoder() <= 0) {
+                listaPoderes.remove(i);
+            }
+        }
+        gerenciarAudioPoderes(temEscudoAtivo, temImaAtivo);
+    }
+
+    private void gerenciarAudioPoderes(boolean temEscudo, boolean temIma) {
+        if (temEscudo) {
+            if (!assets.musicaEscudo.isPlaying()) {
+                musicaPrincipalAtual.pause();
+                assets.musicaIma.stop();
+                assets.musicaEscudo.setLooping(true);
+                assets.musicaEscudo.setVolume(0.5f);
+                assets.musicaEscudo.play();
+                musicaPoderTocando = true;
+            }
+        } else if (temIma) {
+            if (!assets.musicaIma.isPlaying()) {
+                musicaPrincipalAtual.pause();
+                assets.musicaEscudo.stop();
+                assets.musicaIma.setLooping(true);
+                assets.musicaIma.setVolume(0.5f);
+                assets.musicaIma.play();
+                musicaPoderTocando = true;
+            }
+        } else {
+            if (musicaPoderTocando) {
+                assets.musicaEscudo.stop();
+                assets.musicaIma.stop();
+                musicaPrincipalAtual.play();
+                musicaPoderTocando = false;
+            }
+        }
+    }
+    
 
     private void verificarColisaoInimigos() {
         Rectangle colisaoJogadorTela = personagem.getColisao();
@@ -407,14 +595,21 @@ public class Jogo extends ApplicationAdapter {
         }
     }
 
-    private void verificarInputGranada() {
-        if (Gdx.input.isKeyJustPressed(Input.Keys.G)) {
-            int granadasAtuais = personagem.getQtdGranadas();
-            if (granadasAtuais > 0) {
-                personagem.setQtdGranadas(granadasAtuais - 1);
-            }
+    private void verificarInputTiro() {
+    if (Gdx.input.isKeyJustPressed(Input.Keys.G)) {
+        int tirosAtuais = personagem.getQtdTiros();
+        if (tirosAtuais > 0) {
+            personagem.setQtdTiros(tirosAtuais - 1);
+
+            assets.somTiro.play(0.3f);
+
+            float spawnXTela = 100f + personagem.getColisao().width;
+            float spawnYTela = personagem.getColisao().y + (personagem.getColisao().height / 2f);
+
+            listaProjeteis.add(new Projetil(assets.texRegTiro, spawnXTela, spawnYTela));
         }
     }
+}
 
     private void verificarColetaMoedas() {
         Rectangle colisaoJogador = personagem.getColisao();
@@ -432,6 +627,57 @@ public class Jogo extends ApplicationAdapter {
                 assets.somMoeda.play(0.15f);
                 personagem.adicionarMoeda();
                 geradorCenario.getObjetosAtivos().removeIndex(i);
+            }
+        }
+    }
+
+    private void verificarColisaoTiros() {
+        for (int i = listaProjeteis.size() - 1; i >= 0; i--) {
+            Projetil proj = listaProjeteis.get(i);
+            Rectangle areaTiro = proj.getColisao();
+
+            for (int j = geradorCenario.getObjetosAtivos().size - 1; j >= 0; j--) {
+                ObjetoDeJogo obj = geradorCenario.getObjetosAtivos().get(j);
+
+                if (obj instanceof Missil || obj instanceof Zapper) {
+                    float xObjTela = obj.getPosicao().x - posicaoMapaX + 100f;
+                    float yObjTela = obj.getPosicao().y;
+                    
+                    float larguraObs = (obj instanceof Zapper) ? 32f : 32f;
+                    float alturaObs = (obj instanceof Zapper) ? 48f : 32f;
+
+                    Rectangle areaObstaculoTela = new Rectangle(xObjTela, yObjTela, larguraObs, alturaObs);
+
+                    if (areaTiro.overlaps(areaObstaculoTela)) {
+                        explosoesAtivas.add(new EfeitoExplosao(xObjTela, yObjTela));
+                        assets.somMissilExplosao.play(0.33f);
+                        
+                        geradorCenario.getObjetosAtivos().removeIndex(j);
+                        proj.setAtivo(false);
+                        abatesTotais++;
+                        break;
+                    }
+                }
+            }
+
+            if (!proj.isAtivo()) continue;
+
+            for (int k = listaInimigos.size() - 1; k >= 0; k--) {
+                Inimigo inimigo = listaInimigos.get(k);
+                Rectangle colInimigo = inimigo.getColisao();                
+                float xInimigoTela = colInimigo.x - posicaoMapaX + 100f;               
+                Rectangle areaInimigoTela = new Rectangle(xInimigoTela, colInimigo.y, colInimigo.width, colInimigo.height);
+                
+                if (areaTiro.overlaps(areaInimigoTela)) {
+                    explosoesAtivas.add(new EfeitoExplosao(xInimigoTela, colInimigo.y));
+                    assets.somMissilExplosao.play(0.33f);
+                    
+                    listaInimigos.remove(k);
+                    
+                    proj.setAtivo(false);
+                    abatesTotais++;
+                    break;
+                }
             }
         }
     }
@@ -493,6 +739,12 @@ public class Jogo extends ApplicationAdapter {
                 if (assets.musica2.isPlaying()) {
                     assets.musica2.stop();
                 }
+                if(assets.musicaEscudo.isPlaying()){
+                    assets.musicaEscudo.stop();
+                }
+                if(assets.musicaIma.isPlaying()){
+                    assets.musicaIma.stop();
+                }
 
                 assets.musicaMorte.setLooping(true);
                 assets.musicaMorte.setVolume(0.6f);
@@ -504,7 +756,7 @@ public class Jogo extends ApplicationAdapter {
 
             if (iniciouAnimacaoMorte && explosoesAtivas.isEmpty()) {
                 this.dispose();
-                game.setScreen(new MorteScreen(game, assets));
+                game.setScreen(new MorteScreen(game, assets, abatesTotais, personagem.getDistanciaPercorrida()));
             }
         }
     }

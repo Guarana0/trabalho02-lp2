@@ -19,11 +19,11 @@ public class GameAssets {
     public TextureRegion texRegGrama;
     public TextureRegion texRegMoeda;
     public TextureRegion texRegVida;
-    public TextureRegion texRegGranada;
     public TextureRegion texRegMissil;
     public TextureRegion texRegZapper;
     public TextureRegion texRegEscudo;
     public TextureRegion texRegIma;
+    public TextureRegion texRegTiro;
 
     public TextureRegion texRegFundoGrama;
     public TextureRegion texRegFundoFogo;
@@ -51,15 +51,14 @@ public class GameAssets {
 
     public Sound somPulo;
     public Sound somTiro;
-    public Sound somPowerUp1;
-    public Sound somPowerUp2;
-    public Sound somPowerUp3;
     public Sound somMoeda;
 
     public Music musicaMenu;
     public Music musica1;
     public Music musica2;
     public Music musicaMorte;
+    public Music musicaEscudo;
+    public Music musicaIma;
 
     public GameAssets() {
         this.managerAsset = new AssetManager();
@@ -107,16 +106,14 @@ public class GameAssets {
         managerAsset.load("fontes/explosao.mp3", Sound.class);
         managerAsset.load("fontes/pulo.wav", Sound.class);
         managerAsset.load("fontes/tiro.mp3", Sound.class);
-        managerAsset.load("fontes/powerup1.mp3", Sound.class);
-        managerAsset.load("fontes/powerup2.mp3", Sound.class);
-        managerAsset.load("fontes/powerup3.mp3", Sound.class);
-
         managerAsset.load("fontes/sommoeda.mp3", Sound.class);
 
         managerAsset.load("fontes/musicamenu.mp3", Music.class);
         managerAsset.load("fontes/musica1.mp3", Music.class);
         managerAsset.load("fontes/musica2.mp3", Music.class);
         managerAsset.load("fontes/menuMorte.mp3", Music.class);
+        managerAsset.load("fontes/imaMusica.mp3", Music.class);
+        managerAsset.load("fontes/escudoMusica.mp3", Music.class);
 
         managerAsset.load("textures/concreto.png", Texture.class);
         managerAsset.load("textures/fogo.png", Texture.class);
@@ -124,11 +121,11 @@ public class GameAssets {
         managerAsset.load("textures/grama.png", Texture.class);
         managerAsset.load("textures/moeda.png", Texture.class);
         managerAsset.load("textures/vida.png", Texture.class);
-        managerAsset.load("textures/granada.png", Texture.class);
         managerAsset.load("textures/missil.png", Texture.class);
         managerAsset.load("textures/zapper.png", Texture.class);
         managerAsset.load("textures/escudo.png", Texture.class);
         managerAsset.load("textures/ima.png", Texture.class);
+        managerAsset.load("textures/tiro.png", Texture.class);
 
         managerAsset.load("textures/gramafundo.png", Texture.class);
         managerAsset.load("textures/fogofundo.png", Texture.class);
@@ -154,15 +151,15 @@ public class GameAssets {
         somMissilExplosao = managerAsset.get("fontes/explosao.mp3", Sound.class);
         somPulo = managerAsset.get("fontes/pulo.wav", Sound.class);
         somTiro = managerAsset.get("fontes/tiro.mp3", Sound.class);
-        somPowerUp1 = managerAsset.get("fontes/powerup1.mp3", Sound.class);
-        somPowerUp2 = managerAsset.get("fontes/powerup2.mp3", Sound.class);
-        somPowerUp3 = managerAsset.get("fontes/powerup3.mp3", Sound.class);
         somMoeda = managerAsset.get("fontes/sommoeda.mp3", Sound.class);
 
         musicaMenu = managerAsset.get("fontes/musicamenu.mp3", Music.class);
         musica1 = managerAsset.get("fontes/musica1.mp3", Music.class);
         musica2 = managerAsset.get("fontes/musica2.mp3", Music.class);
         musicaMorte = managerAsset.get("fontes/menuMorte.mp3", Music.class);
+        musicaEscudo = managerAsset.get("fontes/escudoMusica.mp3", Music.class);
+        musicaIma = managerAsset.get("fontes/imaMusica.mp3", Music.class);
+
 
         texRegConcreto = new TextureRegion(managerAsset.get("textures/concreto.png", Texture.class));
         texRegFogo = new TextureRegion(managerAsset.get("textures/fogo.png", Texture.class));
@@ -171,12 +168,12 @@ public class GameAssets {
 
         texRegMoeda = new TextureRegion(managerAsset.get("textures/moeda.png", Texture.class));
         texRegVida = new TextureRegion(managerAsset.get("textures/vida.png", Texture.class));
-        texRegGranada = new TextureRegion(managerAsset.get("textures/granada.png", Texture.class));
 
         texRegMissil = new TextureRegion(managerAsset.get("textures/missil.png", Texture.class));
         texRegZapper = new TextureRegion(managerAsset.get("textures/zapper.png", Texture.class));
         texRegEscudo = new TextureRegion(managerAsset.get("textures/escudo.png", Texture.class));
         texRegIma = new TextureRegion(managerAsset.get("textures/ima.png", Texture.class));
+        texRegTiro = new TextureRegion(managerAsset.get("textures/tiro.png", Texture.class));
 
         texRegFundoGrama = new TextureRegion(managerAsset.get("textures/gramafundo.png", Texture.class));
         texRegFundoFogo = new TextureRegion(managerAsset.get("textures/fogofundo.png", Texture.class));
