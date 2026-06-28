@@ -46,7 +46,6 @@ public class GameAssets {
 
     public Array<TextureRegion> framesVoandoCorvo;
 
-
     public Sound somPulo;
     public Sound somTiro;
     public Sound somPowerUp1;
@@ -138,7 +137,6 @@ public class GameAssets {
         managerAsset.load("textures/goblinSprite.png", Texture.class);
         managerAsset.load("textures/corvoSprite.png", Texture.class);
 
-
         for (int i = 0; i < 24; i++) {
             // String.format("%02d", i) transforma o número 0 em "00", 1 em "01", etc.
             String caminhoFrame = String.format("textures/explosao_frames/explosao_%02d.png", i);
@@ -203,9 +201,12 @@ public class GameAssets {
         carregaGoblin();
         carregaCorvo();
 
-        if (texEsqueleto != null) texEsqueleto.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        if (texGoblin != null) texGoblin.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        if (texCorvo != null) texCorvo.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        if (texEsqueleto != null)
+            texEsqueleto.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        if (texGoblin != null)
+            texGoblin.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        if (texCorvo != null)
+            texCorvo.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
         framesExplosao = new Array<>();
         for (int i = 0; i < 24; i++) {

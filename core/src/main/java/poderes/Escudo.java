@@ -55,9 +55,19 @@ public class Escudo extends Poder {
         return tamanhoEscudo;
     }
 
-    public void renderizar(SpriteBatch batch, float x, float y) {
+    public void renderizar(SpriteBatch batch, float x, float y, float largura, float altura) {
         if (estaAtivo && textura != null) {
-            batch.draw(textura, x, y, 32f, 32f);
+            batch.draw(textura, x, y, largura, altura);
+        }
+    }
+
+    public void renderizar(SpriteBatch batch, float x, float y) {
+        renderizar(batch, x, y, 32f, 32f);
+    }
+
+    public void renderizarItem(SpriteBatch batch, float xTela, float yTela) {
+        if (!estaAtivo && textura != null && areaItem.width > 0) {
+            batch.draw(textura, xTela, yTela, 32f, 32f);
         }
     }
 }
