@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public abstract class Inimigo extends Personagem {
-    protected float velocidadeX = -20f;
+    protected float velocidadeX = -80f;
     protected boolean indoEsquerda = true;
     protected boolean jaCausouDano = false;
 
