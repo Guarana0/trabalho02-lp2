@@ -28,9 +28,6 @@ public class GameAssets {
     public TextureRegion texRegFundoNeve;
     public TextureRegion texRegFundoConcreto;
 
-    public TextureRegion texEscudo;
-    public TextureRegion texIma;
-
     public Array<TextureRegion> framesExplosao;
 
     public Texture texPersonagem;
@@ -49,7 +46,6 @@ public class GameAssets {
     public Array<TextureRegion> framesPulandoGoblin;
 
     public Array<TextureRegion> framesVoandoCorvo;
-
 
     public Sound somPulo;
     public Sound somTiro;
@@ -143,7 +139,6 @@ public class GameAssets {
         managerAsset.load("textures/goblinSprite.png", Texture.class);
         managerAsset.load("textures/corvoSprite.png", Texture.class);
 
-
         for (int i = 0; i < 24; i++) {
             // String.format("%02d", i) transforma o número 0 em "00", 1 em "01", etc.
             String caminhoFrame = String.format("textures/explosao_frames/explosao_%02d.png", i);
@@ -179,9 +174,6 @@ public class GameAssets {
         texRegMissil = new TextureRegion(managerAsset.get("textures/missil.png", Texture.class));
         texRegZapper = new TextureRegion(managerAsset.get("textures/zapper.png", Texture.class));
 
-        texEscudo = new TextureRegion(managerAsset.get("textures/escudo.png", Texture.class));
-        texIma = new TextureRegion(managerAsset.get("textures/ima.png", Texture.class));
-
         texRegFundoGrama = new TextureRegion(managerAsset.get("textures/gramafundo.png", Texture.class));
         texRegFundoFogo = new TextureRegion(managerAsset.get("textures/fogofundo.png", Texture.class));
         texRegFundoNeve = new TextureRegion(managerAsset.get("textures/nevefundo.png", Texture.class));
@@ -212,9 +204,12 @@ public class GameAssets {
         carregaGoblin();
         carregaCorvo();
 
-        if (texEsqueleto != null) texEsqueleto.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        if (texGoblin != null) texGoblin.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        if (texCorvo != null) texCorvo.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        if (texEsqueleto != null)
+            texEsqueleto.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        if (texGoblin != null)
+            texGoblin.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        if (texCorvo != null)
+            texCorvo.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
         framesExplosao = new Array<>();
         for (int i = 0; i < 24; i++) {
