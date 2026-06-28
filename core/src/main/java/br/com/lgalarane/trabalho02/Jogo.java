@@ -168,8 +168,8 @@ public class Jogo extends ApplicationAdapter {
     }
 
     @Override
-    public void render() { // Garanta que o método recebe 'delta' como parâmetro do Screen
-        float delta = Gdx.graphics.getDeltaTime();
+    public void render() { 
+        float delta = Gdx.graphics.getDeltaTime(); //recebe o delta
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
         if (personagem.getVida() > 0) {
             tempoTotal += delta;
