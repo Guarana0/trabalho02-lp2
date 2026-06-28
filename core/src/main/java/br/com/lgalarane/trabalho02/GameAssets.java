@@ -22,6 +22,8 @@ public class GameAssets {
     public TextureRegion texRegGranada;
     public TextureRegion texRegMissil;
     public TextureRegion texRegZapper;
+    public TextureRegion texRegEscudo;
+    public TextureRegion texRegIma;
 
     public TextureRegion texRegFundoGrama;
     public TextureRegion texRegFundoFogo;
@@ -121,18 +123,16 @@ public class GameAssets {
         managerAsset.load("textures/neve.png", Texture.class);
         managerAsset.load("textures/grama.png", Texture.class);
         managerAsset.load("textures/moeda.png", Texture.class);
-<<<<<<<<< Temporary merge branch 1
         managerAsset.load("textures/vida.png", Texture.class);
         managerAsset.load("textures/granada.png", Texture.class);
         managerAsset.load("textures/missil.png", Texture.class);
         managerAsset.load("textures/escudo.png", Texture.class);
         managerAsset.load("textures/ima.png", Texture.class);
-=========
+
         managerAsset.load("textures/granada.png", Texture.class); 
         managerAsset.load("textures/missil.png", Texture.class); 
         managerAsset.load("textures/escudo.png", Texture.class); 
         managerAsset.load("textures/ima.png", Texture.class); 
->>>>>>>>> Temporary merge branch 2
 
         managerAsset.load("textures/gramafundo.png", Texture.class);
         managerAsset.load("textures/fogofundo.png", Texture.class);
@@ -179,6 +179,8 @@ public class GameAssets {
 
         texRegMissil = new TextureRegion(managerAsset.get("textures/missil.png", Texture.class));
         texRegZapper = new TextureRegion(managerAsset.get("textures/zapper.png", Texture.class));
+        texRegEscudo = new TextureRegion(managerAsset.get("textures/escudo.png", Texture.class));
+        texRegIma = new TextureRegion(managerAsset.get("textures/ima.png", Texture.class));
 
         texRegFundoGrama = new TextureRegion(managerAsset.get("textures/gramafundo.png", Texture.class));
         texRegFundoFogo = new TextureRegion(managerAsset.get("textures/fogofundo.png", Texture.class));

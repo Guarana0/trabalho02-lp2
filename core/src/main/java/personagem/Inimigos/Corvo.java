@@ -23,5 +23,10 @@ public class Corvo extends Inimigo {
         TextureRegion frame = animVoando.getKeyFrame(stateTime, true);
         batch.draw(frame, posicao.x, posicao.y, dimensoes.x, dimensoes.y);
     }
-}
 
+    public void renderizar(SpriteBatch batch, float xTela) {
+        stateTime += Gdx.graphics.getDeltaTime();
+        TextureRegion frame = animVoando.getKeyFrame(stateTime, true);
+        batch.draw(frame, xTela, posicao.y, dimensoes.x, dimensoes.y);
+    }
+}
