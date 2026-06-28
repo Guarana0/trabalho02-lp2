@@ -57,14 +57,12 @@ public class Jogo extends ApplicationAdapter {
     // Teto para evitar valores absurdos.
     private static final float VELOCIDADE_MAPA_MAX = 900f;
 
-    // Ajuste de progressão/“aceleração” da rolagem.
-    // A ideia é: crescer mais DEVAGAR e com curva suave (sem brusquidão).
-    // tempoTotal é em segundos.
-    private static final float TEMPO_CURVA_MAPA_MAX = 70f; // quanto mais tempo, mais devagar acelera
+    // Tempo base entre spawns de inimigos
+    private static final float TEMPO_SPAWN_INIMIGO_BASE = 3f;
+    private static final float TEMPO_SPAWN_INIMIGO_MIN = 0.8f;
 
-    // Suavização extra (mais baixo = mais suave / demora mais pra acompanhar a
-    // alvo)
-    private static final float SUAVIZACAO_VELOCIDADE = 3.5f;
+    // Velocidade do jogo
+    private static final float TEMPO_VELOCIDADE_MAX = 70f;
 
     private float tempoTotal = 0f;
     private float velocidadeMapaAtual = VELOCIDADE_MAPA_BASE;
@@ -72,11 +70,10 @@ public class Jogo extends ApplicationAdapter {
     float larguraMundo;
     float alturaMundo;
 
+    private float tempoDesdeUltimoInimigo = 0f;
     private float tempoDesdeUltimoPoder = 0f;
     private final float TEMPO_SPAWN_PODER = 8f;
 
-    private float tempoDesdeUltimoInimigo = 0f;
-    private final float TEMPO_SPAWN = 3f;
 
     private Animation<TextureRegion> animacaoExplosao;
     private final ArrayList<EfeitoExplosao> explosoesAtivas = new ArrayList<>();
@@ -164,17 +161,8 @@ public class Jogo extends ApplicationAdapter {
         if (personagem.getVida() > 0) {
             tempoTotal += delta;
 
-            // Velocidade alvo com curva suave (exponencial) para evitar brusquidão.
-            // Começa em VELOCIDADE_MAPA_BASE e se aproxima de VELOCIDADE_MAPA_MAX.
-            float t = Math.min(tempoTotal, TEMPO_CURVA_MAPA_MAX);
-            float frac = 1f - (float) Math.exp(-t / (TEMPO_CURVA_MAPA_MAX / 4f));
-            float velocidadeAlvo = VELOCIDADE_MAPA_BASE + (VELOCIDADE_MAPA_MAX - VELOCIDADE_MAPA_BASE) * frac;
-
-            // Suavização adicional: a velocidade atual converge continuamente para a alvo.
-            float alpha = 1f - (float) Math.exp(-SUAVIZACAO_VELOCIDADE * delta);
-            velocidadeMapaAtual = velocidadeMapaAtual + (velocidadeAlvo - velocidadeMapaAtual) * alpha;
-
-            velocidadeMapaAtual = Math.min(velocidadeMapaAtual, VELOCIDADE_MAPA_MAX);
+            // Velocidade aumenta com o tempo (progressão simples)
+            velocidadeMapaAtual = getVelocidadeAtual();
 
             personagem.atualizar(delta, velocidadeMapaAtual);
             posicaoMapaX += velocidadeMapaAtual * delta;
@@ -186,7 +174,7 @@ public class Jogo extends ApplicationAdapter {
             verificarInputGranada();
 
             tempoDesdeUltimoInimigo += delta;
-            if (tempoDesdeUltimoInimigo >= TEMPO_SPAWN) {
+            if (tempoDesdeUltimoInimigo >= getTempoSpawnInimigo()) {
                 spawnInimigo();
                 tempoDesdeUltimoInimigo = 0f;
             }
@@ -446,6 +434,24 @@ public class Jogo extends ApplicationAdapter {
                 geradorCenario.getObjetosAtivos().removeIndex(i);
             }
         }
+    }
+
+    /**
+     * Calcula o tempo de spawn de inimigos baseado no tempo de jogo.
+     * A cada 60 segundos o spawn fica mais rápido até o mínimo de 0.8s.
+     */
+    private float getTempoSpawnInimigo() {
+        float dificuldade = Math.min(tempoTotal / 60f, 1f);
+        return TEMPO_SPAWN_INIMIGO_BASE - (TEMPO_SPAWN_INIMIGO_BASE - TEMPO_SPAWN_INIMIGO_MIN) * dificuldade;
+    }
+
+    /**
+     * Calcula a velocidade atual do mapa baseada no tempo de jogo.
+     * A cada 70 segundos atinge a velocidade máxima.
+     */
+    private float getVelocidadeAtual() {
+        float dificuldade = Math.min(tempoTotal / TEMPO_VELOCIDADE_MAX, 1f);
+        return VELOCIDADE_MAPA_BASE + (VELOCIDADE_MAPA_MAX - VELOCIDADE_MAPA_BASE) * dificuldade;
     }
 
     public void spawnInimigo() {

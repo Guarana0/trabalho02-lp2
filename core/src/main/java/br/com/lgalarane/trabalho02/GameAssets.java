@@ -126,13 +126,9 @@ public class GameAssets {
         managerAsset.load("textures/vida.png", Texture.class);
         managerAsset.load("textures/granada.png", Texture.class);
         managerAsset.load("textures/missil.png", Texture.class);
+        managerAsset.load("textures/zapper.png", Texture.class);
         managerAsset.load("textures/escudo.png", Texture.class);
         managerAsset.load("textures/ima.png", Texture.class);
-
-        managerAsset.load("textures/granada.png", Texture.class); 
-        managerAsset.load("textures/missil.png", Texture.class); 
-        managerAsset.load("textures/escudo.png", Texture.class); 
-        managerAsset.load("textures/ima.png", Texture.class); 
 
         managerAsset.load("textures/gramafundo.png", Texture.class);
         managerAsset.load("textures/fogofundo.png", Texture.class);
