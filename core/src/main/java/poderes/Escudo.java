@@ -53,6 +53,11 @@ public class Escudo extends Poder {
         personagem.setProtegidoPorEscudo(this.estaAtivo);
     }
 
+    public void desativar() {
+        this.estaAtivo = false;
+        this.tempoPoder = 0f;
+    }
+
     public Rectangle getTamanhoEscudo() {
         return tamanhoEscudo;
     }

@@ -23,7 +23,7 @@ public class Ima extends Poder {
         this.areaItem.set(0, 0, 32f, 32f);
     }
 
-    public void atualizar(float delta, PersonagemPrincipal personagem, Array<ObjetoDeJogo> objetos) {
+    public void atualizar(float delta, PersonagemPrincipal personagem, Array<ObjetoDeJogo> objetos, float jogadorMundoX) {
         if (!estaAtivo) {
             personagem.setImaAtivo(false);
             return;
@@ -37,21 +37,21 @@ public class Ima extends Poder {
             return;
         }
 
-        atrairMoedas(personagem, objetos, delta);
+        atrairMoedas(personagem, objetos, delta, jogadorMundoX);
         personagem.setImaAtivo(true);
     }
 
-    private void atrairMoedas(PersonagemPrincipal personagem, Array<ObjetoDeJogo> objetos, float delta) {
-        Vector2 posJogador = personagem.getPosicao();
+    private void atrairMoedas(PersonagemPrincipal personagem, Array<ObjetoDeJogo> objetos, float delta, float jogadorMundoX) {
+        Vector2 posJogadorMundo = new Vector2(jogadorMundoX, personagem.getPosicao().y);
         Vector2 direcao = new Vector2();
 
         for (ObjetoDeJogo obj : objetos) {
             if (!(obj instanceof MoedaTile))
                 continue;
 
-            float distancia = posJogador.dst(obj.getPosicao());
+            float distancia = posJogadorMundo.dst(obj.getPosicao());
             if (distancia < 250f) {
-                direcao.set(posJogador).sub(obj.getPosicao()).nor();
+                direcao.set(posJogadorMundo).sub(obj.getPosicao()).nor();
                 obj.getPosicao().mulAdd(direcao, 600f * delta);
             }
         }

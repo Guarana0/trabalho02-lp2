@@ -202,7 +202,7 @@ public class Jogo extends ApplicationAdapter {
                         ima.setEstaAtivo(true);
                         ima.getAreaItem().set(0, 0, 0, 0);
                     }
-                    ima.atualizar(delta, personagem, geradorCenario.getObjetosAtivos());
+                    ima.atualizar(delta, personagem, geradorCenario.getObjetosAtivos(), posicaoMapaX);
                 }
 
                 if (!poder.estaAtivo() && poder.getTempoPoder() <= 0) {
@@ -310,6 +310,7 @@ public class Jogo extends ApplicationAdapter {
             if (colisaoJogadorMundo.overlaps(areaInimigo)) {
                 if (personagem.temEscudo()) {
                     personagem.desativarEscudo();
+                    desativarEscudoAtivo();
                 } else {
                     personagem.tomarDano(inimigo.getDano());
                 }
@@ -349,6 +350,7 @@ public class Jogo extends ApplicationAdapter {
 
                     if (personagem.temEscudo()) {
                         personagem.desativarEscudo();
+                        desativarEscudoAtivo();
                     } else {
                         personagem.tomarDano(personagem.getVida());
                     }
@@ -374,6 +376,15 @@ public class Jogo extends ApplicationAdapter {
             }
         } else {
             ultimoMissilAvistado = null;
+        }
+    }
+
+    private void desativarEscudoAtivo() {
+        for (int i = listaPoderes.size() - 1; i >= 0; i--) {
+            Poder poder = listaPoderes.get(i);
+            if (poder instanceof Escudo escudo && escudo.estaAtivo()) {
+                escudo.desativar();
+            }
         }
     }
 
