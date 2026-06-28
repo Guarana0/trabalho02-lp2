@@ -192,7 +192,7 @@ public class Jogo extends ApplicationAdapter {
             }
             iniciaListaDeInimigos(delta);
             ajustaPoderes(delta);
-            verificaMusicas(delta); 
+            atualizarPoderes(delta);
         }
         for (int i = explosoesAtivas.size() - 1; i >= 0; i--) {
             EfeitoExplosao exp = explosoesAtivas.get(i);
@@ -217,11 +217,10 @@ public class Jogo extends ApplicationAdapter {
         }
 
         renderizaObjetos();
-        renderizaPoderes(delta);
+        desenharPoderes();
         renderizaHUD();
 
         batch.end();
-
         fimJogo(); 
     }
 
@@ -365,7 +364,7 @@ public class Jogo extends ApplicationAdapter {
         }
     }
 
-    private void renderizaPoderes(float delta){
+    private void atualizarPoderes(float delta) {
         tempoDesdeUltimoPoder += delta;
         if (tempoDesdeUltimoPoder >= TEMPO_SPAWN_PODER) {
             spawnPoder();
@@ -374,41 +373,58 @@ public class Jogo extends ApplicationAdapter {
 
         for (int i = listaPoderes.size() - 1; i >= 0; i--) {
             Poder poder = listaPoderes.get(i);
-            if (poder instanceof Escudo escudo) {
-                // Verifica colisão convertendo coordenadas do mundo para tela
-                Rectangle areaItemTela = new Rectangle();
-                areaItemTela.set(escudo.getAreaItem());
-                areaItemTela.setPosition(
-                        escudo.getAreaItem().x - posicaoMapaX + 100f,
-                        escudo.getAreaItem().y);
 
-                if (!escudo.estaAtivo() && personagem.getColisao().overlaps(areaItemTela)) {
-                    escudo.setEstaAtivo(true);
-                    escudo.getAreaItem().set(0, 0, 0, 0);
-                    //da mais tiros
-                    personagem.setQtdTiros(personagem.getQtdTiros() + 5);
+            if (poder.estaAtivo()) {
+                if (poder instanceof Escudo escudo) {
+                    escudo.atualizar(delta, personagem);
+                } else if (poder instanceof Ima ima) {
+                    ima.atualizar(delta, personagem, geradorCenario.getObjetosAtivos(), posicaoMapaX);
                 }
-                escudo.atualizar(delta, personagem);
-            } else if (poder instanceof Ima ima) {
-                // Verifica colisão convertendo coordenadas do mundo para tela
-                Rectangle areaItemTela = new Rectangle();
-                areaItemTela.set(ima.getAreaItem());
-                areaItemTela.setPosition(
-                        ima.getAreaItem().x - posicaoMapaX + 100f,
-                        ima.getAreaItem().y);
 
-                if (!ima.estaAtivo() && personagem.getColisao().overlaps(areaItemTela)) {
-                    ima.setEstaAtivo(true);
-                    ima.getAreaItem().set(0, 0, 0, 0);
+                if (poder.getTempoPoder() <= 0) {
+                    poder.setEstaAtivo(false);
+                    listaPoderes.remove(i);
                 }
-                ima.atualizar(delta, personagem, geradorCenario.getObjetosAtivos(), posicaoMapaX);
+                continue;
             }
 
-             if (!poder.estaAtivo() && poder.getTempoPoder() <= 0) {
+            Rectangle areaItemTela = new Rectangle();
+            areaItemTela.set(poder.getAreaItem());
+            areaItemTela.setPosition(
+                    poder.getAreaItem().x - posicaoMapaX + 100f,
+                    poder.getAreaItem().y);
+
+            if (personagem.getColisao().overlaps(areaItemTela)) {
+                System.out.println("DEBUG: COLIDIU! FORÇANDO SOM...");
+                
+                assets.somPoder.play(1.0f); 
+                
+                poder.setEstaAtivo(true);
+                if (poder instanceof Escudo) {
+                    personagem.setQtdTiros(personagem.getQtdTiros() + 5);
+                }
+                
                 listaPoderes.remove(i);
             }
         }
     }
+
+    private void desenharPoderes() {
+    for (Poder poder : listaPoderes) {
+        if (poder.getAreaItem().width > 0) {
+            
+            float xTela = poder.getAreaItem().x - posicaoMapaX + 100f;
+            float yTela = poder.getAreaItem().y;
+            
+            if (poder instanceof Escudo escudo){
+                escudo.renderizar(batch, xTela, yTela, poder.getAreaItem().width, poder.getAreaItem().height);
+            } else if (poder instanceof Ima ima){
+                ima.renderizar(batch, xTela, yTela, poder.getAreaItem().width, poder.getAreaItem().height);
+            }
+            
+        }
+    }
+}
     
 
     private void renderizaHUD(){
@@ -432,76 +448,7 @@ public class Jogo extends ApplicationAdapter {
 
         font.draw(batch, "Abates: " + abatesTotais, 10, hudTop - 145);
     }
-
-    private void verificaMusicas(float delta) {
-        boolean temEscudoAtivo = false;
-        boolean temImaAtivo = false;
-
-        for (int i = listaPoderes.size() - 1; i >= 0; i--) {
-            Poder poder = listaPoderes.get(i);
-            
-            if (poder instanceof Escudo escudo) {
-                Rectangle areaItemTela = new Rectangle(escudo.getAreaItem());
-                areaItemTela.setPosition(escudo.getAreaItem().x - posicaoMapaX + 100f, escudo.getAreaItem().y);
-
-                if (!escudo.estaAtivo() && personagem.getColisao().overlaps(areaItemTela)) {
-                    escudo.setEstaAtivo(true);
-                    escudo.getAreaItem().set(0, 0, 0, 0);
-                }
-                
-                escudo.atualizar(delta, personagem);
-                if (escudo.estaAtivo()) temEscudoAtivo = true;
-
-            } else if (poder instanceof Ima ima) {
-                Rectangle areaItemTela = new Rectangle(ima.getAreaItem());
-                areaItemTela.setPosition(ima.getAreaItem().x - posicaoMapaX + 100f, ima.getAreaItem().y);
-
-                if (!ima.estaAtivo() && personagem.getColisao().overlaps(areaItemTela)) {
-                    ima.setEstaAtivo(true);
-                    ima.getAreaItem().set(0, 0, 0, 0);
-                }
-                
-                ima.atualizar(delta, personagem, geradorCenario.getObjetosAtivos(), posicaoMapaX);
-                if (ima.estaAtivo()) temImaAtivo = true;
-            }
-
-            if (!poder.estaAtivo() && poder.getTempoPoder() <= 0) {
-                listaPoderes.remove(i);
-            }
-        }
-        gerenciarAudioPoderes(temEscudoAtivo, temImaAtivo);
-    }
-
-    private void gerenciarAudioPoderes(boolean temEscudo, boolean temIma) {
-        if (temEscudo) {
-            if (!assets.musicaEscudo.isPlaying()) {
-                musicaPrincipalAtual.pause();
-                assets.musicaIma.stop();
-                assets.musicaEscudo.setLooping(true);
-                assets.musicaEscudo.setVolume(0.5f);
-                assets.musicaEscudo.play();
-                musicaPoderTocando = true;
-            }
-        } else if (temIma) {
-            if (!assets.musicaIma.isPlaying()) {
-                musicaPrincipalAtual.pause();
-                assets.musicaEscudo.stop();
-                assets.musicaIma.setLooping(true);
-                assets.musicaIma.setVolume(0.5f);
-                assets.musicaIma.play();
-                musicaPoderTocando = true;
-            }
-        } else {
-            if (musicaPoderTocando) {
-                assets.musicaEscudo.stop();
-                assets.musicaIma.stop();
-                musicaPrincipalAtual.play();
-                musicaPoderTocando = false;
-            }
-        }
-    }
     
-
     private void verificarColisaoInimigos() {
         Rectangle colisaoJogadorTela = personagem.getColisao();
         Rectangle colisaoJogadorMundo = new Rectangle(
@@ -738,12 +685,6 @@ public class Jogo extends ApplicationAdapter {
                 }
                 if (assets.musica2.isPlaying()) {
                     assets.musica2.stop();
-                }
-                if(assets.musicaEscudo.isPlaying()){
-                    assets.musicaEscudo.stop();
-                }
-                if(assets.musicaIma.isPlaying()){
-                    assets.musicaIma.stop();
                 }
 
                 assets.musicaMorte.setLooping(true);

@@ -2,7 +2,6 @@ package br.com.lgalarane.trabalho02;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.Gdx;
 
 public class JogoScreen implements Screen {
     private final Game game;
