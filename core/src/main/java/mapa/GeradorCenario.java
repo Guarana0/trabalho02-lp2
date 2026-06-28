@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 
 import mapa.obstaculos.Missil;
+import mapa.obstaculos.Zapper;
 import mapa.tiles.ConcretoTile;
 import mapa.tiles.FogoTile;
 import mapa.tiles.GramaTile;
@@ -29,18 +30,19 @@ public class GeradorCenario {
     private final TextureRegion texGrama;
     private final TextureRegion texMoeda;
     private final TextureRegion texMissil; 
+    private final TextureRegion texZapper; 
 
 
-    public GeradorCenario(TextureRegion concreto, TextureRegion fogo, TextureRegion neve, TextureRegion grama, TextureRegion moeda, TextureRegion missil) {
+    public GeradorCenario(TextureRegion concreto, TextureRegion fogo, TextureRegion neve, TextureRegion grama, TextureRegion moeda, TextureRegion missil, TextureRegion zapper) {
         this.objetosAtivos = new Array<>();
         this.biomaAtual = TipoBioma.CONCRETO;
-        
         this.texConcreto = concreto;
         this.texFogo = fogo;
         this.texNeve = neve;
         this.texGrama = grama;
         this.texMoeda = moeda;
         this.texMissil = missil;
+        this.texZapper = zapper;
         
         for (int i = 0; i < 30; i++) {
             gerarProximoBloco();
@@ -103,10 +105,15 @@ public class GeradorCenario {
         }
 
         if (!gerouMoeda && MathUtils.randomBoolean(0.13f) && proximoX > (20 * TAMANHO_TILE)) {
-            float alturaMissil = MathUtils.random(100f, 250f);
+            float alturaObstaculo = MathUtils.random(100f, 250f);
             
-            Missil novoMissil = new Missil(texMissil, proximoX, alturaMissil);
-            objetosAtivos.add(novoMissil);
+            if (MathUtils.randomBoolean(0.5f)) {
+                Missil novoMissil = new Missil(texMissil, proximoX, alturaObstaculo);
+                objetosAtivos.add(novoMissil);
+            } else {
+                Zapper novoZapper = new Zapper(texZapper, proximoX, alturaObstaculo);
+                objetosAtivos.add(novoZapper);
+            }
         }
 
         proximoX += TAMANHO_TILE;
@@ -135,8 +142,10 @@ public class GeradorCenario {
             if (obj instanceof Missil) {
                 Missil m = (Missil) obj;
                 m.getPosicao().x -= m.getVelocidade() * delta; 
-                
-                m.atualizarSeno(delta); 
+                m.atualizarObstaculo(delta);
+            } else if (obj instanceof Zapper) {
+                Zapper z = (Zapper) obj;
+                z.atualizarObstaculo(delta);
             }
 
             if (obj.getPosicao().x < jogadorX - 300) {
@@ -144,6 +153,7 @@ public class GeradorCenario {
             }
         }
     }
+    
 
     public void renderizar(SpriteBatch batch, float jogadorX) {
         for (ObjetoDeJogo obj : objetosAtivos) {
@@ -153,10 +163,31 @@ public class GeradorCenario {
             if (obj instanceof MoedaTile) {
                 largura = 32f;
                 altura = 32f;
+            } else if (obj instanceof Zapper) {
+                largura = 32f;
+                altura = 48f;
+            } else if (obj instanceof Missil) {
+                largura = 32f;
+                altura = 32f;
             }
 
             float posXNaTela = obj.getPosicao().x - jogadorX + 100f;
-            batch.draw(obj.getTextura(), posXNaTela, obj.getPosicao().y, largura, altura);
+            if (obj instanceof Zapper) {
+                Zapper zapper = (Zapper) obj;
+                float origemX = largura / 2f;
+                float origemY = altura / 2f;
+
+                batch.draw(
+                    zapper.getTextura(),
+                    posXNaTela, obj.getPosicao().y,
+                    origemX, origemY,      
+                    largura, altura,          
+                    1f, 1f,             
+                    zapper.getAngulo()            
+                );
+            } else {
+                batch.draw(obj.getTextura(), posXNaTela, obj.getPosicao().y, largura, altura);
+            }
         }
     }
 

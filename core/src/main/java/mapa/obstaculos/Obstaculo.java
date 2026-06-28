@@ -26,5 +26,5 @@ public abstract class Obstaculo extends ObjetoDeJogo {
     public float getVelocidade() {
         return this.velocidade;
     }
-    
+    public abstract void atualizarObstaculo(float delta);
 }
