@@ -19,8 +19,7 @@ public class Esqueleto extends Inimigo {
         animCorrendo = new com.badlogic.gdx.graphics.g2d.Animation<>(
                 0.1f,
                 assets.framesCorrendoEsqueleto,
-                com.badlogic.gdx.graphics.g2d.Animation.PlayMode.LOOP
-        );
+                com.badlogic.gdx.graphics.g2d.Animation.PlayMode.LOOP);
     }
 
     public void renderizar(SpriteBatch batch) {
@@ -28,7 +27,10 @@ public class Esqueleto extends Inimigo {
         TextureRegion frame = animCorrendo.getKeyFrame(stateTime, true);
         batch.draw(frame, posicao.x, posicao.y, dimensoes.x, dimensoes.y);
     }
+
+    public void renderizar(SpriteBatch batch, float xTela) {
+        stateTime += com.badlogic.gdx.Gdx.graphics.getDeltaTime();
+        TextureRegion frame = animCorrendo.getKeyFrame(stateTime, true);
+        batch.draw(frame, xTela, posicao.y, dimensoes.x, dimensoes.y);
+    }
 }
-
-
-

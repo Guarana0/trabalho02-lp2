@@ -21,9 +21,10 @@ public class Goblin extends Inimigo {
     public Goblin(float x, float y, float largura, float altura, Sound somDano, GameAssets assets) {
         super(x, y, largura, altura, somDano);
 
-        // animações recortadas com base na spritesheet (256x64 conforme definido no GameAssets)
+        // animações recortadas com base na spritesheet (256x64 conforme definido no
+        // GameAssets)
         animCorrendo = new Animation<>(0.1f, assets.framesCorrendoGoblin, Animation.PlayMode.LOOP);
-        animPulando  = new Animation<>(0.1f, assets.framesPulandoGoblin,  Animation.PlayMode.LOOP);
+        animPulando = new Animation<>(0.1f, assets.framesPulandoGoblin, Animation.PlayMode.LOOP);
     }
 
     public void renderizar(SpriteBatch batch) {
@@ -36,6 +37,13 @@ public class Goblin extends Inimigo {
         batch.draw(frame, posicao.x, posicao.y, dimensoes.x, dimensoes.y);
     }
 
+    public void renderizar(SpriteBatch batch, float xTela) {
+        stateTime += com.badlogic.gdx.Gdx.graphics.getDeltaTime();
+
+        TextureRegion frame = pulando
+                ? animPulando.getKeyFrame(stateTime, true)
+                : animCorrendo.getKeyFrame(stateTime, true);
+
+        batch.draw(frame, xTela, posicao.y, dimensoes.x, dimensoes.y);
+    }
 }
-
-

@@ -14,16 +14,16 @@ public abstract class Poder {
         }
     }
 
-    public boolean estaAtivo() {
-        return estaAtivo;
-    }
-
     public Rectangle getAreaItem() {
         return areaItem;
     }
 
     public float getTempoPoder() {
         return tempoPoder;
+    }
+
+    public boolean estaAtivo() {
+        return estaAtivo;
     }
 
     public boolean verificarColisao(personagem.Personagem personagem) {

@@ -12,7 +12,6 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -25,10 +24,12 @@ import mapa.obstaculos.Obstaculo;
 import mapa.planosdefundo.GeradorFundo;
 import mapa.tiles.MoedaTile;
 import objetos.ObjetoDeJogo;
+import poderes.Escudo;
+import poderes.Ima;
+import poderes.Poder;
 import personagem.Inimigo;
 import personagem.Inimigos.Esqueleto;
 import personagem.Inimigos.Goblin;
-import poderes.*;
 import personagem.Inimigos.Corvo;
 
 import personagem.PersonagemPrincipal;
@@ -37,7 +38,6 @@ public class Jogo extends ApplicationAdapter {
     private final Game game;
 
     private SpriteBatch batch;
-    private ShapeRenderer shapeRenderer;
     private BitmapFont font;
     private GeradorCenario geradorCenario;
     private GeradorFundo geradorFundo;
@@ -55,10 +55,11 @@ public class Jogo extends ApplicationAdapter {
     float larguraMundo;
     float alturaMundo;
 
+    private float tempoDesdeUltimoPoder = 0f;
+    private final float TEMPO_SPAWN_PODER = 8f;
+
     private float tempoDesdeUltimoInimigo = 0f;
     private final float TEMPO_SPAWN = 3f;
-    private float tempoDesdeUltimoPoder = 0f;
-    private final float TEMPO_SPAWN_PODER = 6f; 
 
     private Animation<TextureRegion> animacaoExplosao;
     private final ArrayList<EfeitoExplosao> explosoesAtivas = new ArrayList<>();
@@ -86,14 +87,12 @@ public class Jogo extends ApplicationAdapter {
         alturaMundo = Gdx.graphics.getHeight();
 
         listaInimigos = new ArrayList<>();
-
         listaPoderes = new ArrayList<>();
 
         assets = new GameAssets();
         assets.carregaTodosAssets();
 
         batch = new SpriteBatch();
-        shapeRenderer = new ShapeRenderer();
         font = new BitmapFont();
         font.setColor(Color.WHITE);
 
@@ -106,8 +105,7 @@ public class Jogo extends ApplicationAdapter {
                 assets.texRegGrama,
                 assets.texRegMoeda,
                 assets.texRegMissil,
-                assets.texRegZapper
-        );
+                assets.texRegZapper);
 
         geradorFundo = new GeradorFundo(
                 assets.texRegFundoGrama,
@@ -180,12 +178,12 @@ public class Jogo extends ApplicationAdapter {
             for (int i = listaPoderes.size() - 1; i >= 0; i--) {
                 Poder poder = listaPoderes.get(i);
                 if (poder instanceof Escudo escudo) {
+                    // Verifica colisão convertendo coordenadas do mundo para tela
                     Rectangle areaItemTela = new Rectangle();
                     areaItemTela.set(escudo.getAreaItem());
                     areaItemTela.setPosition(
-                        escudo.getAreaItem().x - posicaoMapaX + 100f,
-                        escudo.getAreaItem().y
-                    );
+                            escudo.getAreaItem().x - posicaoMapaX + 100f,
+                            escudo.getAreaItem().y);
 
                     if (!escudo.estaAtivo() && personagem.getColisao().overlaps(areaItemTela)) {
                         escudo.setEstaAtivo(true);
@@ -193,18 +191,18 @@ public class Jogo extends ApplicationAdapter {
                     }
                     escudo.atualizar(delta, personagem);
                 } else if (poder instanceof Ima ima) {
+                    // Verifica colisão convertendo coordenadas do mundo para tela
                     Rectangle areaItemTela = new Rectangle();
                     areaItemTela.set(ima.getAreaItem());
                     areaItemTela.setPosition(
-                        ima.getAreaItem().x - posicaoMapaX + 100f,
-                        ima.getAreaItem().y
-                    );
+                            ima.getAreaItem().x - posicaoMapaX + 100f,
+                            ima.getAreaItem().y);
 
                     if (!ima.estaAtivo() && personagem.getColisao().overlaps(areaItemTela)) {
                         ima.setEstaAtivo(true);
                         ima.getAreaItem().set(0, 0, 0, 0);
                     }
-                    ima.atualizar(delta, personagem, geradorCenario.getObjetosAtivos(), posicaoMapaX);
+                    ima.atualizar(delta, personagem, geradorCenario.getObjetosAtivos());
                 }
 
                 if (!poder.estaAtivo() && poder.getTempoPoder() <= 0) {
@@ -227,7 +225,7 @@ public class Jogo extends ApplicationAdapter {
         TipoBioma biomaAtivo = geradorCenario.getBiomaSobOJogador(posicaoMapaX);
         geradorFundo.renderizar(batch, biomaAtivo);
         geradorCenario.renderizar(batch, posicaoMapaX);
-        
+
         for (EfeitoExplosao exp : explosoesAtivas) {
             TextureRegion frameAtual = animacaoExplosao.getKeyFrame(exp.tempoDeVida);
             batch.draw(frameAtual, exp.x, exp.y, 32f, 32f);
@@ -256,15 +254,17 @@ public class Jogo extends ApplicationAdapter {
         }
 
         for (Inimigo inimigo : listaInimigos) {
+            float xTela = inimigo.getPosicao().x - posicaoMapaX + 100f;
             if (inimigo instanceof Esqueleto esqueleto) {
-                esqueleto.renderizar(batch);
+                esqueleto.renderizar(batch, xTela);
             } else if (inimigo instanceof Goblin goblin) {
-                goblin.renderizar(batch);
+                goblin.renderizar(batch, xTela);
             } else if (inimigo instanceof Corvo corvo) {
-                corvo.renderizar(batch);
+                corvo.renderizar(batch, xTela);
             }
         }
 
+        // Renderiza os itens dos poderes no mapa (antes de serem coletados)
         for (Poder poder : listaPoderes) {
             if (poder instanceof Escudo escudo) {
                 float xTela = escudo.getAreaItem().x - posicaoMapaX + 100f;
@@ -281,34 +281,33 @@ public class Jogo extends ApplicationAdapter {
             }
         }
 
-        float hudPoderesY = 20f; 
+        // Renderiza os ícones dos poderes na HUD (quando ativos)
         for (Poder poder : listaPoderes) {
-            if (poder instanceof Escudo escudo && escudo.estaAtivo()) {
-                escudo.renderizar(batch, 10f, hudPoderesY, 48f, 48f);
-            } else if (poder instanceof Ima ima && ima.estaAtivo()) {
-                ima.renderizar(batch, 65f, hudPoderesY, 48f, 48f);
+            if (poder instanceof Escudo escudo) {
+                escudo.renderizar(batch, 10f, Gdx.graphics.getHeight() - 125f, 48f, 48f);
+            } else if (poder instanceof Ima ima) {
+                ima.renderizar(batch, 50f, Gdx.graphics.getHeight() - 125f, 48f, 48f);
             }
         }
 
         batch.end();
 
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        for (Inimigo inimigo : listaInimigos) {
-            inimigo.renderizar(shapeRenderer);
-        }
-        shapeRenderer.end();
-
         fimJogo();
     }
 
     private void verificarColisaoInimigos() {
-        Rectangle colisaoJogador = personagem.getColisao();
+        Rectangle colisaoJogadorTela = personagem.getColisao();
+        Rectangle colisaoJogadorMundo = new Rectangle(
+                colisaoJogadorTela.x - 100f + posicaoMapaX,
+                colisaoJogadorTela.y,
+                colisaoJogadorTela.width,
+                colisaoJogadorTela.height);
 
         for (int i = listaInimigos.size() - 1; i >= 0; i--) {
             Inimigo inimigo = listaInimigos.get(i);
             Rectangle areaInimigo = inimigo.getColisao();
 
-            if (colisaoJogador.overlaps(areaInimigo)) {
+            if (colisaoJogadorMundo.overlaps(areaInimigo)) {
                 if (personagem.temEscudo()) {
                     personagem.desativarEscudo();
                 } else {
@@ -341,7 +340,7 @@ public class Jogo extends ApplicationAdapter {
                 Rectangle areaObstaculoTela = new Rectangle(xObstaculoTela, yObstaculoTela, larguraObs, alturaObs);
 
                 if (colisaoJogador.overlaps(areaObstaculoTela)) {
-                    
+
                     if (obstaculo instanceof Missil) {
                         assets.somMissilExplosao.play(0.33f);
                     } else {
@@ -359,7 +358,7 @@ public class Jogo extends ApplicationAdapter {
                     }
 
                     geradorCenario.getObjetosAtivos().removeIndex(i);
-                    
+
                     if (ultimoMissilAvistado == obstaculo) {
                         ultimoMissilAvistado = null;
                     }
@@ -407,23 +406,8 @@ public class Jogo extends ApplicationAdapter {
         }
     }
 
-    public void spawnPoder() {
-        float xInicial = posicaoMapaX + 250f;
-        float ySpawn = MathUtils.random(50f, alturaMundo - 150f);
-
-        if (MathUtils.randomBoolean()) {
-            Escudo escudo = new Escudo(assets.texEscudo);
-            escudo.getAreaItem().set(xInicial, ySpawn, 32f, 32f);
-            listaPoderes.add(escudo);
-        } else {
-            Ima ima = new Ima(assets.texIma);
-            ima.getAreaItem().set(xInicial, ySpawn, 32f, 32f);
-            listaPoderes.add(ima);
-        }
-    }
-
     public void spawnInimigo() {
-        float xInicial = larguraMundo + 50f;
+        float xInicial = posicaoMapaX - 100f + larguraMundo + 50f;
         int tipoInimigo = MathUtils.random(0, 2);
         float inimigoLargura = 80f;
         float inimigoAltura = 80f;
@@ -435,6 +419,20 @@ public class Jogo extends ApplicationAdapter {
         } else { // Corvo (voador)
             float yAleatorio = MathUtils.random(alturaMundo / 3f, alturaMundo - 120f);
             listaInimigos.add(new Corvo(xInicial, yAleatorio, inimigoLargura, inimigoAltura, assets.somDano, assets));
+        }
+    }
+
+    public void spawnPoder() {
+        float xItem = posicaoMapaX - 100f + larguraMundo + 50f;
+        float yItem = MathUtils.random(100f, alturaMundo - 100f);
+        if (MathUtils.randomBoolean(0.5f)) {
+            Escudo escudo = new Escudo(assets.texRegEscudo);
+            escudo.getAreaItem().set(xItem, yItem, 32f, 32f);
+            listaPoderes.add(escudo);
+        } else {
+            Ima ima = new Ima(assets.texRegIma);
+            ima.getAreaItem().set(xItem, yItem, 32f, 32f);
+            listaPoderes.add(ima);
         }
     }
 
@@ -466,7 +464,6 @@ public class Jogo extends ApplicationAdapter {
     @Override
     public void dispose() {
         batch.dispose();
-        shapeRenderer.dispose();
         font.dispose();
     }
 }
