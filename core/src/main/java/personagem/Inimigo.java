@@ -2,7 +2,7 @@ package personagem;
 
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public abstract class Inimigo extends Personagem {
     protected float velocidadeX = -20f;
@@ -29,14 +29,18 @@ public abstract class Inimigo extends Personagem {
         }
     }
 
-    public void renderizar(ShapeRenderer shape) {
-        shape.setColor(Color.RED);
-        shape.rect(posicao.x, posicao.y, dimensoes.x, dimensoes.y);
+    public void renderizar(SpriteBatch batch) {
+        // Default draw for subclasses that implement SpriteBatch render
+    }
+
+    public void renderizar(SpriteBatch batch, float posicaoTelaX) {
+        float oldX = posicao.x;
+        posicao.x = posicaoTelaX;
+        renderizar(batch);
+        posicao.x = oldX;
     }
 
     public void update(float deltaTime) {
-        posicao.x += (velocidade.x - 150f) * deltaTime; 
-        
-        areaColisao.setPosition(posicao.x, posicao.y);
+        posicao.x += velocidade.x * deltaTime;
     }
 }
