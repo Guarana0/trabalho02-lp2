@@ -16,7 +16,7 @@ public class Missil extends Obstaculo implements Explodivel{
         this.alturaBase = y; 
     }
 
-    public void atualizarSeno(float delta) {
+    public void atualizarObstaculo(float delta) {
         tempo += delta * VELOCIDADE_OSCILACAO;
         float novoY = alturaBase + (MathUtils.sin(tempo) * AMPLITUDE); 
         getPosicao().y = novoY;
