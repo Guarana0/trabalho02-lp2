@@ -14,6 +14,18 @@ public abstract class Poder {
         }
     }
 
+    public boolean estaAtivo() {
+        return estaAtivo;
+    }
+
+    public Rectangle getAreaItem() {
+        return areaItem;
+    }
+
+    public float getTempoPoder() {
+        return tempoPoder;
+    }
+
     public boolean verificarColisao(personagem.Personagem personagem) {
         if (personagem == null || personagem.getColisao() == null || areaItem == null) {
             return false;
