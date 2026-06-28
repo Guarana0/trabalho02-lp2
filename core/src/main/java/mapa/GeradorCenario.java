@@ -11,7 +11,7 @@ import mapa.tiles.ConcretoTile;
 import mapa.tiles.FogoTile;
 import mapa.tiles.GramaTile;
 import mapa.tiles.MoedaTile;
-import mapa.tiles.NeveTile; // Import do seu míssil ajustado
+import mapa.tiles.NeveTile; 
 import objetos.ObjetoDeJogo;
 
 public class GeradorCenario {

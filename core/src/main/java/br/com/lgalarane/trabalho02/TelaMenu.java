@@ -77,23 +77,27 @@ public class TelaMenu extends ScreenAdapter {
 
         lote.begin();
         String titulo = "MENU PRINCIPAL";
-        String instrucao = "CLIQUE OU PRESSIONE ENTER PARA INICIAR";
+        String instrucao = "CLIQUE OU PRESSIONE ENTER PARA INICIAR\nCLIQUE COM O MOUSE PARA VOAR\nAPERTE G PARA ATIRAR!";
 
         float alpha = 0.5f + 0.5f * MathUtils.sin(tempo * 3f);
 
-        desenharTextoSombreado(titulo, fonteTitulo, h * 0.6f, Color.WHITE, Color.BLACK);
-        desenharTextoSombreado(instrucao, fonteTexto, h * 0.4f, new Color(1, 1, 1, alpha), Color.BLACK);
+        float yTitulo = pY + (pH * 0.75f); 
+        float yInstrucao = pY + (pH * 0.4f);
+
+        desenharTextoSombreado(titulo, fonteTitulo, yTitulo, Color.WHITE, Color.BLACK);
+        desenharTextoSombreado(instrucao, fonteTexto, yInstrucao, new Color(1, 1, 1, alpha), Color.BLACK);
 
         lote.end();
     }
 
     private void desenharTextoSombreado(String texto, BitmapFont fonte, float y, Color cor, Color sombra) {
-        layout.setText(fonte, texto);
-        float x = (Gdx.graphics.getWidth() - layout.width) / 2f;
+        layout.setText(fonte, texto, cor, Gdx.graphics.getWidth(), com.badlogic.gdx.utils.Align.center, true);
+        
         fonte.setColor(sombra);
-        fonte.draw(lote, texto, x + 2, y - 2); 
+        fonte.draw(lote, texto, 2, y - 2, Gdx.graphics.getWidth(), com.badlogic.gdx.utils.Align.center, true); 
+        
         fonte.setColor(cor);
-        fonte.draw(lote, texto, x, y); 
+        fonte.draw(lote, texto, 0, y, Gdx.graphics.getWidth(), com.badlogic.gdx.utils.Align.center, true); 
     }
 
     @Override

@@ -3,6 +3,7 @@ package poderes;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
+
 import personagem.PersonagemPrincipal;
 
 public class Escudo extends Poder {
